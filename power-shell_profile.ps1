@@ -47,7 +47,7 @@ function Add-ConsoleHistoryShortcut {
 }
 
 function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
-    $Env:PATH = "$($Env:PATH);($NewEnvironmentPath)"
+    $Env:PATH = "$($Env:PATH);$($NewEnvironmentPath)"
     Write-Output $Env:PATH.Split(';')
 }
 
