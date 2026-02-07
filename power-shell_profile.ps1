@@ -225,10 +225,22 @@ function Get-AlignedText ([string]$FilePath, [char]$CharSeparator) {
     }
 }
 
+function Get-IsFileDownloading([string]$path, [int]$sleepMilliseconds = 200) {
+    if (-not (Test-Path $RegPath)) {
+        return $false 
+    }
+
+    # Check file size twice with a short delay
+    $size1 = (Get-Item $file).Length
+    Start-Sleep -Milliseconds $sleepMilliseconds
+    $size2 = (Get-Item $file).Length
+
+    return $size1 -ne $size2
+}
+
 function Get-FunctionName([int]$StackNumber = 1) {
     return [string]$(Get-PSCallStack)[$StackNumber].FunctionName
 }
-
 
 function Import-EdgeBookmarks {
     # Path to Edge bookmarks file
@@ -290,33 +302,45 @@ function Install-PowerShell {
 
 # Open-ProgrammingSoftwareDownloadPages
 function Open-ProgrammingSoftwareDownloadPages {
+    $time = [System.DateTime]::Now.AddMinutes()
     $ProgramsToInstall = @(
-        ,@{Program="Azure Storage Explorer";        DownloadDirect="https://go.microsoft.com/fwlink/?linkid=2216182"; DownloadPage="https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4"; }
-        ,@{Program="Docker Desktop";                DownloadDirect=""; DownloadPage=""; }
-        ,@{Program="dotPeek";                       DownloadDirect="https://www.jetbrains.com/decompiler/download/download-thanks.html?platform=windowsWeb"; DownloadPage="https://www.jetbrains.com/decompiler/download/#section=web-installer"; }
-        ,@{Program="git";                           DownloadDirect="https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.2/Git-2.51.0.2-64-bit.exe"; DownloadPage="https://git-scm.com/downloads/win"; }
-        ,@{Program="KeePass";                       DownloadDirect="https://sourceforge.net/projects/keepass/files/KeePass%202.x/2.59/KeePass-2.59-Setup.exe/download"; DownloadPage="https://keepass.info/download.html"; }
-        ,@{Program="Notepad++";                     DownloadDirect="https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.8.3/npp.8.8.3.Installer.x64.exe"; DownloadPage="https://notepad-plus-plus.org/downloads/"; }
-        # ,@{Program="Outlook (classic)";             DownloadDirect=""; DownloadPage="https://apps.microsoft.com/detail/xp9mhd8pgh9n47?hl=en-US&gl=GB"; }
-        ,@{Program="Postman";                       DownloadDirect="https://dl.pstmn.io/download/latest/win64"; DownloadPage="https://www.postman.com/downloads/"; }
-        ,@{Program="SQL Server Management Studio";  DownloadDirect=""; DownloadPage=""; }
-        ,@{Program="Visual Studio Code";            DownloadDirect="https://code.visualstudio.com/docs/?dv=win64"; DownloadPage="https://code.visualstudio.com/Download#"; }
-        ,@{Program="Visual Studio";                 DownloadDirect="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Professional&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false"; DownloadPage="https://my.visualstudio.com/?wt.mc_id=visual-studio-subscriber-assignment_eml"; }
-        ,@{Program="";                              DownloadDirect=""; DownloadPage=""; }
+        # ,@{Program="Azure Storage Explorer";        DownloadPage="https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4"; DownloadDirect="https://go.microsoft.com/fwlink/?linkid=2216182"; }
+        # ,@{Program="Docker Desktop";                DownloadPage=""; DownloadDirect=""; }
+        # ,@{Program="dotPeek";                       DownloadPage="https://www.jetbrains.com/decompiler/download/#section=web-installer"; DownloadDirect="https://www.jetbrains.com/decompiler/download/download-thanks.html?platform=windowsWeb"; }
+        # ,@{Program="git";                           DownloadPage="https://git-scm.com/downloads/win"; DownloadDirect="https://github.com/git-for-windows/git/releases/download/v2.51.0.windows.2/Git-2.51.0.2-64-bit.exe"; }
+        # ,@{Program="KeePass";                       DownloadPage="https://keepass.info/download.html"; DownloadDirect="https://sourceforge.net/projects/keepass/files/KeePass%202.x/2.59/KeePass-2.59-Setup.exe/download"; }
+        # ,@{Program="Notepad++";                     DownloadPage="https://notepad-plus-plus.org/downloads/"; DownloadDirect="https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.8.3/npp.8.8.3.Installer.x64.exe"; }
+        # ,@{Program="Outlook (classic)";             DownloadPage="https://apps.microsoft.com/detail/xp9mhd8pgh9n47?hl=en-US&gl=GB"; DownloadDirect=""; }
+        # ,@{Program="Postman";                       DownloadPage="https://www.postman.com/downloads/"; DownloadDirect="https://dl.pstmn.io/download/latest/win64"; }
+        # ,@{Program="SQL Server Management Studio";  DownloadPage=""; DownloadDirect=""; }
+        # ,@{Program="Visual Studio Code";            DownloadPage="https://code.visualstudio.com/Download#"; DownloadDirect="https://code.visualstudio.com/docs/?dv=win64"; }
+        # ,@{Program="Visual Studio";                 DownloadPage="https://my.visualstudio.com/?wt.mc_id=visual-studio-subscriber-assignment_eml"; DownloadDirect="https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Professional&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false"; }
+        # ,@{Program="";                              DownloadPage=""; DownloadDirect=""; }
 
-        ,@{Program="Chrome";                        DownloadDirect=""; DownloadPage="https://www.google.com/intl/pl/chrome/"; }
-        ,@{Program="Epic Launcher";                 DownloadDirect="https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi"; DownloadPage="https://store.epicgames.com/pl/download"; }
-        ,@{Program="GOG Galaxy";                    DownloadDirect="https://webinstallers.gog-statics.com/download/GOG_Galaxy_2.0.exe?payload=rS-EW5Haq4-aKktlGFxAGM6BKp5oKuzVQql0bM5RH8t84XBlyKFo1UrhWs3f8OXtwD9C8x9fno8iZFnwgvw7pamDrhc8hGWN6IF1tQ_fcaMUEwrTtzYB9Rok0Uh2zijK94BRExpfXnmSI-dVL1STpxU31wotAmVxhrjAn8Wo42diQ9QmhArLDBPsFYqZ2ZYq-GLvjyDXk4tDaVgGIrYgWUZ7SZzs_mbnQxIqWMjZ8MZrLCuUHS1GkvfThkjRO1Ru95JFBBlMktZgy7q_NNlct_Zlc0tDD6vSMxIsY_7rti7jfXg3YwB4LvgZOWF45vq3hyuVW5JmRJCnBqDHqfDxtQtzJ5Qunc7rAnOIp8qa1LMWbFOVSmD0N4kzaWNhaHQtr4_4Ih6j324XOsCO-zWkGcANy90_jLKFUNlxOLklczd-mqfEwvAUSEiycqlbXYgA7LLi9BHs5pTb0J-J2sZMF39Ks-aTM05hmOfLF0XMnsXvUPCB6rESm0BvuZfg9KfqVJtTrzeYtw0TParZpRAN_AXD24ewicw0Z7haig6JgrmAvkegppWaU77wlgcts8Me4hV8jjpOrnWedCSFPnInzwZdrLoG9_IljOJYGkx7Z4_TsefJ9Dz0Erjvgs8PFd1ME1kKKnNY4723sCpmOAXa8xhZqOGa2iZLXfnz1V2taIqx6ijui19aNU7uLgkE7RA3p7ht19KW7c3Jiyt6pzrZsiCT4zKw6FmI4mACqjeLqjW-qAXbiADuRvdI6kHRPbe9PR_pPuhnzozu86tsyk2rxHzWIcqgFrAgGvkO4gGCsv3COSVA"; DownloadPage="https://www.gogalaxy.com/en/"; }
-        ,@{Program="Nvidia App";                    DownloadDirect="https://us.download.nvidia.com/nvapp/client/11.0.5.420/NVIDIA_app_v11.0.5.420.exe"; DownloadPage="https://www.nvidia.com/en-us/software/nvidia-app/"; }
-        ,@{Program="Steam";                         DownloadDirect="https://cdn.fastly.steamstatic.com/client/installer/SteamSetup.exe"; DownloadPage="https://store.steampowered.com/about/"; }
+        # ,@{Program="Chrome";                        DownloadPage="https://www.google.com/intl/pl/chrome/"; DownloadDirect=""; }
+        # ,@{Program="Epic Launcher";                 DownloadPage="https://store.epicgames.com/pl/download"; DownloadDirect="https://launcher-public-service-prod06.ol.epicgames.com/launcher/api/installer/download/EpicGamesLauncherInstaller.msi"; }
+        # ,@{Program="Gimp";                          DownloadPage="https://www.gimp.org/downloads/"; DownloadDirect="https://download.gimp.org/gimp/v3.0/windows/gimp-3.0.6-setup-1.exe"; }
+        # ,@{Program="GOG Galaxy";                    DownloadPage="https://www.gogalaxy.com/en/"; DownloadDirect="https://webinstallers.gog-statics.com/download/GOG_Galaxy_2.0.exe?payload=rS-EW5Haq4-aKktlGFxAGM6BKp5oKuzVQql0bM5RH8t84XBlyKFo1UrhWs3f8OXtwD9C8x9fno8iZFnwgvw7pamDrhc8hGWN6IF1tQ_fcaMUEwrTtzYB9Rok0Uh2zijK94BRExpfXnmSI-dVL1STpxU31wotAmVxhrjAn8Wo42diQ9QmhArLDBPsFYqZ2ZYq-GLvjyDXk4tDaVgGIrYgWUZ7SZzs_mbnQxIqWMjZ8MZrLCuUHS1GkvfThkjRO1Ru95JFBBlMktZgy7q_NNlct_Zlc0tDD6vSMxIsY_7rti7jfXg3YwB4LvgZOWF45vq3hyuVW5JmRJCnBqDHqfDxtQtzJ5Qunc7rAnOIp8qa1LMWbFOVSmD0N4kzaWNhaHQtr4_4Ih6j324XOsCO-zWkGcANy90_jLKFUNlxOLklczd-mqfEwvAUSEiycqlbXYgA7LLi9BHs5pTb0J-J2sZMF39Ks-aTM05hmOfLF0XMnsXvUPCB6rESm0BvuZfg9KfqVJtTrzeYtw0TParZpRAN_AXD24ewicw0Z7haig6JgrmAvkegppWaU77wlgcts8Me4hV8jjpOrnWedCSFPnInzwZdrLoG9_IljOJYGkx7Z4_TsefJ9Dz0Erjvgs8PFd1ME1kKKnNY4723sCpmOAXa8xhZqOGa2iZLXfnz1V2taIqx6ijui19aNU7uLgkE7RA3p7ht19KW7c3Jiyt6pzrZsiCT4zKw6FmI4mACqjeLqjW-qAXbiADuRvdI6kHRPbe9PR_pPuhnzozu86tsyk2rxHzWIcqgFrAgGvkO4gGCsv3COSVA"; }
+        # ,@{Program="Nvidia App";                    DownloadPage="https://www.nvidia.com/en-us/software/nvidia-app/"; DownloadDirect="https://us.download.nvidia.com/nvapp/client/11.0.5.420/NVIDIA_app_v11.0.5.420.exe"; }
+        # ,@{Program="Steam";                         DownloadPage="https://store.steampowered.com/about/"; DownloadDirect="https://cdn.fastly.steamstatic.com/client/installer/SteamSetup.exe"; }
+        # ,@{Program="Ubisoft Connect";               DownloadPage="https://www.ubisoft.com/pl-pl/ubisoft-connect/download"; DownloadDirect="https://ubi.li/4vxt9"; }
     )
     
     foreach ($ProgramToInstall in $ProgramsToInstall) {
         if ($ProgramToInstall.DownloadDirect -ne '') { 
             Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadDirect
-            #TODO check is page exists and file has been downloaded, if not open DownloadPage
-            
-            #if not Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadPage
+
+            # # TODO
+            # $files = Get-ChildItem -Path "$($env:UserProfile)\Downloads\" -File | Where-Object { $_.CreationTime -gt $time }
+            # #TODO check is page exists and file has been downloaded, if not open DownloadPage
+            # foreach ($file in $files) {
+            #     while (Get-IsFileDownloading "$($env:UserProfile)\Downloads\$($file.Name)") { 
+            #         Write-Output "$("$($env:UserProfile)\Downloads\$($file.Name)") still downloading...`n"
+            #     }
+                
+            #     Start-Process "$($env:UserProfile)\Downloads\$($file.Name)"
+            # }
+        # if not Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadPage
         } elseif ($ProgramToInstall.DownloadPage -ne '') {
             Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadPage
         }
@@ -627,6 +651,32 @@ function Update-Cmdlet {
 
     Write-Output "`Cmdlet functions updated:`n"
     $Env:PATH.Split(';')
+}
+
+function Export-VsCodeSettings {
+  $PathSettingsStore = ".\vscode-settings"
+  $PathCodeSettings  = "$env:AppData\Code\User"
+  $FileExtensions    = "extensions.txt"
+  $FileKeyBindings   = "keybindings.json"
+  $FileSettings      = "settings.json"
+  
+  Copy-Item "$PathCodeSettings\$FileKeyBindings" "$PathSettingsStore\$FileKeyBindings" -Force
+  Copy-Item "$PathCodeSettings\$FileSettings"    "$PathSettingsStore\$FileSettings"    -Force
+  Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
+  Write-Output "`Settings have been exported.`n"
+}
+
+function Import-VsCodeSettings {
+  $PathSettingsStore = ".\vscode-settings"
+  $PathCodeSettings  = "$env:AppData\Code\User"
+  $FileExtensions    = "extensions.txt"
+  $FileKeyBindings   = "keybindings.json"
+  $FileSettings      = "settings.json"
+  
+  Copy-Item "$PathSettingsStore\$FileKeyBindings" $PathCodeSettings -Force
+  Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
+  Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
+Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
 }
 
 #################################################     TODO    ##################################################
