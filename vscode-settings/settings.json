@@ -72,5 +72,8 @@
   "editor.minimap.renderCharacters": false,
   "prettier.configPath": "C:\\Users\\kacper.sledz\\source\\repos\\Knowledge-Redesign\\src\\frontend\\.prettierrc",
   "playwright.showTrace": true,
-  "terminal.integrated.enableMultiLinePasteWarning": "never"
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "editor.scrollBeyondLastLine": false,
+  "editor.scrollBeyondLastColumn": 0,
+  "editor.minimap.showSlider": "always"
 }
