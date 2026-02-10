@@ -50,6 +50,7 @@ function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
     $Env:PATH = "$($Env:PATH);$($NewEnvironmentPath)"
     Write-Output $Env:PATH.Split(';')
 }
+# Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
 
 # Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos" -Content "directory"
 function Add-IfNotExist([string]$ItemPath, [string]$Content) {

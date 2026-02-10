@@ -10,6 +10,7 @@ esbenp.prettier-vscode@12.3.0
 firefox-devtools.vscode-firefox-debug@2.15.0
 github.copilot-chat@0.37.1
 gruntfuggly.todo-tree@0.0.226
+james-yu.latex-workshop@10.12.2
 mhutchie.git-graph@1.30.0
 ms-azuretools.vscode-bicep@0.40.2
 ms-dotnettools.csdevkit@2.10.3
@@ -18,5 +19,6 @@ ms-dotnettools.vscode-dotnet-runtime@3.0.0
 ms-playwright.playwright@1.1.17
 ms-vscode.powershell@2025.4.0
 ms-vscode.test-adapter-converter@0.2.1
+redhat.vscode-xml@0.29.0
 ritwickdey.liveserver@5.7.9
-streetsidesoftware.code-spell-checker@4.4.0
+streetsidesoftware.code-spell-checker@4.5.6
