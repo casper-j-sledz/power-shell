@@ -20,6 +20,9 @@
 # Show-FileExtensions
 # Uninstall-WindowsJunkApplications
 # Update-PowerShell
+# Import-VsCodeSettings # Export-VsCodeSettings
+# Disable-WindowsNotificationSounds
+# Enable-ClipboardHistory
 
 # Add-NewEnvironmentVariable -NewEnvironmentPath "C:\Tools"
 # Get-AlignedText -FilePath "$($env:UserProfile)\Downloads\RunCommands.txt" -CharSeparator '-'
@@ -678,6 +681,19 @@ function Import-VsCodeSettings {
   Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
   Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
 Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
+}
+
+function Disable-WindowsNotificationSounds {
+  #Disable Windows notification sounds (without blocking toasts)
+  Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "(Default)" -Value ""
+}
+
+function Enable-ClipboardHistory {
+  Set-ItemProperty `
+    -Path "HKCU:\Software\Microsoft\Clipboard" `
+    -Name "EnableClipboardHistory" `
+    -Type DWord `
+    -Value 1
 }
 
 #################################################     TODO    ##################################################
