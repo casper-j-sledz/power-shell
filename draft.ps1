@@ -1,4 +1,10 @@
-﻿##############################################     Development    ##############################################
+﻿# Set terminal buffer size / display length
+# → File → Preferences → Settings
+# → Terminal › Integrated: Scrollback
+#   Controls the maximum amount of lines the terminal keeps in its buffer.
+# → set → 8192
+
+##############################################     Development    ##############################################
 
 # Extracting used EntityFramework version and installing it globally
 $efVersionMatch     = $dalCoreProjectFile | Select-String -Pattern 'Include="Microsoft.EntityFrameworkCore.Tools" Version="(.*)"'
@@ -133,6 +139,133 @@ jb inspectCode --build --format=Text -o="$($env:UserProfile)\Downloads\-code-ins
 #Get-ItemProperty -Path $path | Format-List
 #dir $path | Format-List
 
+############################ Notes ############################
+
+# Azurite
+#    Installation:
+npm install -g azurite
+#    Run azurite:
+azurite --silent --location c:\azurite --debug c:\azurite\debug.log
+
+# $Env:
+Get-ChildItem Env:
+
+# Pipeline chain operators (Connecting commands)
+&& # (PowerShell 7+) Run next command only if the first one succeeds.
+|| # (PowerShell 7+) Run next command after firs finish.
+;  #                 Run next command after firs finish.
+
+# .bat - Don't close / Keep open
+cmd /k
+
+# Check used ports
+netstat -ano -p tcp | Sort-Object -Property "Local Address" | find "{port}"
+
+# Enable Hyper-V (ADMIN)
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+
+# Enable WSL (ADMIN)
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+wsl --set-default-version 2
+
+# Get processes (Require additional formatting!)
+wmic process list | Format-Table -AutoSize
+
+# IP scripts
+$dnsList = 'address1','address2', '...'
+
+$IPs = @()
+foreach ($e in $dnsList) {
+  $IPs = Resolve-DnsName $e | Select-Object -Index 0 | Select-Object 'Name', 'IPAddress'
+}
+
+foreach ($e in $dnsList) { 
+  Write-Output $e':1521'
+  tcpping $e':1521' 
+}
+# Kudu
+# Go to app directory:
+  Set-Location c:\artifacts
+
+# Print app directory:
+  Get-ChildItem c:\artifacts /o-s
+
+# Search File By Partial Name:
+  Get-ChildItem c:\artifacts\{{ Partial Name }}*
+
+# Print File:
+  Get-Content c:\artifacts\{{ File Name}}
+
+# Changing Browser Storage Size:
+  localStorage.maxViewItems=2000
+
+# Long paths enabling
+$path = 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'
+$name = 'LongPathsEnabled'
+$currentValue = Get-ItemPropertyValue -Path $path -Name $name
+$value = 1
+
+Set-ItemProperty -Path $path -Name $name -Value $value
+$value = (Get-ItemPropertyValue -Path $path -Name $name) -eq 1
+Write-Output 'LongPathsEnabled: '$value
+
+# Change path length limit (default: 260 char)
+# Win + R -> regedit
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem
+# LongPathsEnabled -ChangeValue-> 1
+	
+HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Group Policy Objects
+HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem -Name LongPathsEnabled
+
+# Regedit (UserAccountControl, OneDrive, Objects 3D)
+<#
+HKLM
+HKLM
+$path  = 'HKCU:\TEST\' 
+$name  = 'test2'
+$value = 1
+$type  = 'binary'
+
+Set-Location          -Path $path
+New-Item              -Path $path
+Remove-Item           -Path $path
+Remove-ItemProperty   -Path $path -Name $name
+Set-ItemProperty      -Path $path -Name $name -Value $value
+New-ItemProperty      -Path $path -Name $name -Value $value -PropertyType $type
+Get-ItemPropertyValue -Path $path -Name $name
+Test-Path $path
+#>
+
+#Turn off 'UserAccountControl'
+$path  = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'
+$name  = 'EnableLUA'
+$value = 0
+
+if( (Test-Path $path) -and ((Get-ItemPropertyValue $path -Name $name) -ne ($value)) )
+    {Set-ItemProperty -Path $path -Name $name -Value $value}
+
+#Turn off 'OneDrive'
+$path  = 'HKU:\'
+if(!(Test-Path $path))
+    {New-PSDrive -PSProvider Registry -Name HKU -Root HKEY_USERS}
+#check path!!!       
+$path  = 'HKEY_USERS\S-1-5-21-2645927900-1654800569-189983283-1001\Software\Classes\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}'
+$name  = 'System.IsPinnedToNameSpaceTree'
+$value = 0
+if( (Test-Path $path) -and ((Get-ItemPropertyValue $path -Name $name) -ne ($value)) )
+    {Set-ItemProperty -Path $path -Name $name -Value $value}
+
+#Remove 'Objects 3D'
+$path = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}'
+if(Test-Path $path)
+    {Remove-Item -Path $path}
+
+$path = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}'
+if(Test-Path $path)
+    {Remove-Item -Path $path}
+
+############################ ??? ############################
 
 # ???
 # param (
@@ -143,6 +276,11 @@ jb inspectCode --build --format=Text -o="$($env:UserProfile)\Downloads\-code-ins
 
 # QueueStorage environment variable
 QueueStorageOptions:ConnectionString
+
+# Clear PowerShell
+	Get-Variable true; Clear-Host
+	
+Compare-Object (Get-ChildItem [fullPath] -recurse -name) (Get-ChildItem [fullPath] -recurse -name) -IncludeEqual
 
 ############################ CMD TR ############################
 fnm env --use-on-cd | Out-String | Invoke-Expression
