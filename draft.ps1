@@ -268,11 +268,9 @@ if(Test-Path $path)
 ### Untrack all packages.lock.json files
 
 $root = Get-Location
-
-Get-ChildItem -Path . -Filter "packages.lock.json" -Recurse | ForEach-Object {
-    $_.FullName.Substring($root.Path.Length + 1)
+Get-ChildItem -Path "." -Filter "packages.lock.json" -Recurse | ForEach-Object {
+    git update-index --assume-unchanged ".\$($_.FullName.Substring($root.Path.Length + 1))"
 }
-
 
 ############################ ??? ############################
 
