@@ -29,7 +29,6 @@
 
 #############################################     Functions    #############################################
 
-# Add-ConsoleHistoryShortcut
 function Add-ConsoleHistoryShortcut {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
     $shortcutPath = $env:UserProfile + "\Downloads\ConsoleHistory.lnk"
@@ -48,6 +47,7 @@ function Add-ConsoleHistoryShortcut {
     $shortcutObj.Save()
     Write-Output "Shortcut saved.`n"
 }
+# Add-ConsoleHistoryShortcut
 
 function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
     $Env:PATH = "$($Env:PATH);$($NewEnvironmentPath)"
@@ -55,7 +55,6 @@ function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
 }
 # Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
 
-# Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos" -Content "directory"
 function Add-IfNotExist([string]$ItemPath, [string]$Content) {
   if (-not (Test-Path $ItemPath)) {
     if ($Content.ToLower() -eq "directory") {
@@ -72,6 +71,7 @@ function Add-IfNotExist([string]$ItemPath, [string]$Content) {
     }
   }
 }
+# Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos" -Content "directory"
 
 function Add-PinPathsToMenuStart {
   #Create Recycle Bin Shortcut
@@ -104,14 +104,15 @@ function Add-PinPathsToMenuStart {
     $itemLink.InvokeVerb("pintohome")
   }
 }
+# Add-PinPathsToMenuStart
 
-# Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
 function Add-Shortcut([string]$ShortcutPath, [string]$TargetPath) {
   $wsh = New-Object -ComObject WScript.Shell
   $shortcut = $wsh.CreateShortcut($ShortcutPath)
   $shortcut.TargetPath = $TargetPath
   $shortcut.Save()
 }
+# Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
 
 function Add-StartupShortcuts {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -153,6 +154,7 @@ function Add-StartupShortcuts {
 
     Write-Output "Function executed. `n"
 }
+# Add-StartupShortcuts
 
 function Disable-AutoRunApps {
     Get-CimInstance -ClassName Win32_StartupCommand | 
@@ -184,6 +186,7 @@ function Disable-AutoRunApps {
         }
     }
 }
+# Disable-AutoRunApps
 
 function Disable-LockScreenApps {
     # Open Settings: Click the Start button and select the gear icon for Settings.
@@ -198,6 +201,7 @@ function Disable-LockScreenApps {
     # Remove the detailed status app from the lock screen
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Lock Screen" -Name "DetailedStatus1" -Value ""
 }
+# Disable-LockScreenApps
 
 function Disable-QuickAccessRecentAndFrequentFiles {
     #Disable Recent Files in Quick Access
@@ -213,6 +217,7 @@ function Disable-QuickAccessRecentAndFrequentFiles {
     Stop-Process -Name explorer -Force
     Start-Process explorer
 }
+# Disable-QuickAccessRecentAndFrequentFiles
 
 function Get-AlignedText ([string]$FilePath, [char]$CharSeparator) {
     $maxLength = 0
@@ -228,6 +233,7 @@ function Get-AlignedText ([string]$FilePath, [char]$CharSeparator) {
         Write-Output "$($parts[0].ToLower())$(" "*($firstElement.Length))-$($parts[1..($parts.Count-1)] -join $CharSeparator)"
     }
 }
+# Get-AlignedText "example/path" "|"
 
 function Get-IsFileDownloading([string]$path, [int]$sleepMilliseconds = 200) {
     if (-not (Test-Path $RegPath)) {
@@ -241,6 +247,7 @@ function Get-IsFileDownloading([string]$path, [int]$sleepMilliseconds = 200) {
 
     return $size1 -ne $size2
 }
+# Get-IsFileDownloading "example/path"
 
 function Get-FunctionName([int]$StackNumber = 1) {
     return [string]$(Get-PSCallStack)[$StackNumber].FunctionName
@@ -257,6 +264,7 @@ function Import-EdgeBookmarks {
     Copy-Item $sourceBookmarksFile $edgeBookmarks -Force
     Write-Host "Bookmarks imported from $sourceBookmarksFile to $exportPath successfully!" -ForegroundColor Green
 }
+# Import-EdgeBookmarks
 
 function Install-Angular ([string]$AngularVersion = '') {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -271,8 +279,8 @@ function Install-Angular ([string]$AngularVersion = '') {
     }
     
     Write-Output "`Angular has been installed.`n"
-    
 }
+# Install-Angular
 
 function Install-NodeJs {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -294,6 +302,7 @@ function Install-NodeJs {
 
     Write-Output "`Node.js installed.`n"
 }
+# Install-NodeJs
 
 function Install-PowerShell {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -303,8 +312,8 @@ function Install-PowerShell {
 
     Write-Output "`Powershell installed.`n"
 }
+# Install-PowerShell
 
-# Open-ProgrammingSoftwareDownloadPages
 function Open-ProgrammingSoftwareDownloadPages {
     $time = [System.DateTime]::Now.AddMinutes()
     $ProgramsToInstall = @(
@@ -350,6 +359,7 @@ function Open-ProgrammingSoftwareDownloadPages {
         }
     }
 }
+# Open-ProgrammingSoftwareDownloadPages
 
 function Optimize-Taskbar ([bool]$RestartWindowsExplorer = $false, [bool]$RemoveTaskbarFavorites = $false) {
     # Disable Task View button
@@ -389,6 +399,7 @@ function Optimize-Taskbar ([bool]$RestartWindowsExplorer = $false, [bool]$Remove
         Start-Process explorer
     }
 }
+# Optimize-Taskbar $true
 
 function Set-ClassicContextMenu {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -404,8 +415,8 @@ function Set-ClassicContextMenu {
 
     Write-Output "`nChanges saved. Please restart computer.`n"
 }
+# Set-ClassicContextMenu 
 
-# Set-GitConfig "eg.mail@gmail.com"
 function Set-GitConfig ([string]$UserEmail) {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
     
@@ -419,6 +430,7 @@ function Set-GitConfig ([string]$UserEmail) {
 
     Write-Output "`Git config has been set.`n"
 }
+# Set-GitConfig "eg.mail@gmail.com"
 
 function Set-PolishProgrammersKeyboard {
     # Get current language list
@@ -442,6 +454,7 @@ function Set-PolishProgrammersKeyboard {
     Set-WinUILanguageOverride -Language pl-PL
     Set-WinUserLanguageList -LanguageList (New-WinUserLanguageList pl-PL) -Force
 }
+# Set-PolishProgrammersKeyboard
 
 function Set-PreferredWindowsFormatting {
     # LCID             Name             DisplayName
@@ -550,6 +563,7 @@ function Set-PreferredWindowsFormatting {
 
     Write-Output "Formatting changes saved.`n"
 }
+# Set-PreferredWindowsFormatting
 
 function Set-Properties([parameter(ValueFromPipeline)] $inputObject, [hashtable] $properties, [switch] $passThru) {
     process {
@@ -562,12 +576,14 @@ function Set-TimeUtc1-00 {
     #Set TimeZone to (UTC+01:00) Sarajevo, Skopje, Warsaw, Zagreb (Central European Standard Time)
     Set-TimeZone -Name "Central European Standard Time"
 }
+# Set-TimeUtc1-00
 
 function Set-WindowsThemeDark {
     #Windows (dark), 1 images
     Start-Process -FilePath "control.exe" -ArgumentList "/name Microsoft.Personalization /page pageThemes"
     Start-Process -FilePath "C:\Windows\Resources\Themes\dark.theme"
 }
+# Set-WindowsThemeDark
 
 function Show-FileExtensions {
   # File Explorer -> Menu (...) -> Options 
@@ -588,6 +604,7 @@ function Show-FileExtensions {
   Stop-Process -Name explorer -Force
   Start-Process explorer
 }
+# Show-FileExtensions
 
 function Start-PowerShellAsAdmin {
     Start-Process powershell –verb runAs
@@ -646,6 +663,7 @@ function Uninstall-WindowsJunkApplications {
     Get-AppxPackage | Sort-Object Name | Format-Table Name, PackageFullName
     Write-Output "`Windows junk applications uninstalled.`n"
 }
+# Uninstall-WindowsJunkApplications
 
 function Update-Cmdlet {
     Write-Output "`nUpdating cmdlet functions (Environment Variables)`"$(Get-FunctionName)`"`n"
@@ -656,6 +674,7 @@ function Update-Cmdlet {
     Write-Output "`Cmdlet functions updated:`n"
     $Env:PATH.Split(';')
 }
+# Update-Cmdlet
 
 function Export-VsCodeSettings {
   $PathSettingsStore = ".\vscode-settings"
@@ -669,6 +688,7 @@ function Export-VsCodeSettings {
   Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
   Write-Output "`Settings have been exported.`n"
 }
+# Export-VsCodeSettings
 
 function Import-VsCodeSettings {
   $PathSettingsStore = ".\vscode-settings"
@@ -680,13 +700,15 @@ function Import-VsCodeSettings {
   Copy-Item "$PathSettingsStore\$FileKeyBindings" $PathCodeSettings -Force
   Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
   Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
-Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
+  Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
 }
+# Import-VsCodeSettings
 
 function Disable-WindowsNotificationSounds {
   #Disable Windows notification sounds (without blocking toasts)
   Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "(Default)" -Value ""
 }
+# Disable-WindowsNotificationSounds
 
 function Enable-ClipboardHistory {
   Set-ItemProperty `
@@ -695,6 +717,7 @@ function Enable-ClipboardHistory {
     -Type DWord `
     -Value 1
 }
+# Enable-ClipboardHistory
 
 #################################################     TODO    ##################################################
 
