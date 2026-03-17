@@ -51,19 +51,21 @@ function Import-PowerShellProfile {
 #############################################     Functions    #############################################
 
 function Add-ConsoleHistoryShortcut {
+    # Open PowerShell Profile directory: `explorer.exe "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine"`
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
-    $shortcutPath = $env:UserProfile + "\Downloads\ConsoleHistory.lnk"
-    $targetPath   = $env:AppData     + "\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
+
+    $shortcutPath = "$env:UserProfile\Downloads\ConsoleHistory.lnk"
+    $targetPath   = "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
     
     if (-not (Test-Path $targetPath)) {
         New-Item -ItemType File -Path $targetPath | Out-Null
-        Write-Output "Empty file created: `"$($targetPath)`""
+        Write-Output "Empty file created: `"$targetPath`""
     }
 
     $wshShell = New-Object -comObject WScript.Shell
-    Write-Output "Creating shortcut object `"$($shortcutPath)`""
+    Write-Output "Creating shortcut object `"$shortcutPath`""
     $shortcutObj = $WshShell.CreateShortcut($shortcutPath)
-    Write-Output "Setting target path to   `"$($targetPath)`""
+    Write-Output "Setting target path to   `"$targetPath`""
     $shortcutObj.TargetPath = $targetPath
     $shortcutObj.Save()
     Write-Output "Shortcut saved.`n"
