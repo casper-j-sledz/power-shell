@@ -272,6 +272,31 @@ Get-ChildItem -Path "." -Filter "packages.lock.json" -Recurse | ForEach-Object {
     git update-index --assume-unchanged ".\$($_.FullName.Substring($root.Path.Length + 1))"
 }
 
+############################ Pictures ############################
+# Set the folder to scan
+$folderPath = "$($env:UserProfile)\Pictures\"
+
+# Get all files recursively
+$files = Get-ChildItem -Path $folderPath -Recurse -File
+
+# Group files by name
+$groupedByName = $files | Group-Object Group-Object { "$($_.Name)-$($_.Length)" } | Where-Object { $_.Count -gt 1 }
+
+# Output duplicates
+if ($groupedByName) {
+    Write-Host "`n=== Duplicate File Names Found ===`n"
+    foreach ($group in $groupedByName) {
+        Write-Host "File Name: $($group.Name)"
+        foreach ($file in $group.Group) {
+            Write-Host " - $($file.FullName) | $($file.Length)"
+        }
+        Write-Host ""
+    }
+} else {
+    Write-Host "No duplicate file names found."
+}
+
+
 ############################ ??? ############################
 
 # ???
