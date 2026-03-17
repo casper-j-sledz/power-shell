@@ -4,6 +4,142 @@
 #   Controls the maximum amount of lines the terminal keeps in its buffer.
 # → set → 8192
 
+#################################################     TODO    ##################################################
+
+function Install-PreferredLanguageAndConfigure {
+    #TODO: INSTALL LANGUAGES & SET UP KEYBOARDS
+    
+    Write-Output "`nInitializing function `"$(Get-FunctionName)`".`n"
+    Write-Output "Installing languages `"en-GB`", `"pl-PL`".`n"
+    Install-Language en-GB
+    Install-Language pl-PL
+    
+    Write-Output "Setting up `"en-GB`" as default system language."
+  
+    Write-Output "Setting up keyboards."
+    # Settings -> Time & language -> Language & region -> English (United Kingdom)
+    #  -> ... -> Language options -> Keyboards -> Add a keyboard -> Polish (Programmers)
+  
+    $path = "Registry::HKEY_USERS\.DEFAULT\Keyboard Layout\Preload"
+    Get-ItemProperty -Path $path | Format-List
+    Get-ChildItem $path | Format-Table
+  
+    $path = "Registry::HKEY_USERS\.DEFAULT\Keyboard Layout\Preload"
+    Get-ItemProperty -Path $path | Format-List
+
+    $path = "HKLM:\SYSTEM\ControlSet001\Control\Keyboard Layouts"
+    Get-ChildItem $path | Format-Table
+    # ID            Layout Text                  Layout File      Layout Display Name
+    # --            -----------                  -----------      -------------------
+    # 00000415      Polish (Programmers)         KBDPL1.DLL       @C:\windows\system32\input.dll,-5035
+    # 00000452      United Kingdom Extended      KBDUKX.DLL       @C:\windows\system32\input.dll,-5145
+    # 00000809      United Kingdom               KBDUK.DLL        @C:\windows\system32\input.dll,-5025
+    
+    Write-Output "Languages installed, keyboards set up.`n"
+}
+
+function Add-DotNet47-ProjectBuildReviewLibraries {
+  Set-Location "$($env:UserProfile)\Downloads\dotnet-test"
+
+  $projectName = "DotNet-DLL-Loader"
+  dotnet new console -n $projectName #-f net6.0 up #.NET Framework 4.7 | ❌ Not supported
+
+  Set-Location .\$projectName
+
+  Set-Content -Path ".\$($projectName).csproj" -Value "<Project Sdk=`"Microsoft.NET.Sdk`">
+    <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net47</TargetFramework>
+    </PropertyGroup>
+  </Project>"
+
+  Set-Content -Path ".\Program.cs" -Value "namespace $($projectName.Replace("-", "."))
+  {
+      internal class Program
+      {
+          static void Main(string[] args) { }
+      }
+  }"
+
+  dotnet add package System.Runtime.CompilerServices.Unsafe --version 6.0.0
+
+  dotnet add package System.Memory --version 4.6.3
+
+  dotnet restore
+
+  dotnet build
+
+  Set-Location .\bin\Debug\net47\
+
+  Get-ChildItem -Filter *.dll -Recurse | ForEach-Object { [System.Reflection.Assembly]::ReflectionOnlyLoadFrom($_.FullName).GetName() }
+}
+
+function DriveOperations {
+    # Remove Drive Letter
+    Set-Partition -DriveLetter H -NewDriveLetter $null
+    # Change Drive Letter
+    Set-Partition -DriveLetter D -NewDriveLetter T
+    # Rename Driver
+    Set-Volume -DriveLetter C -NewFileSystemLabel "Primary"
+    Set-Volume -DriveLetter D -NewFileSystemLabel "Secondary"
+
+    #     <#
+    # https://www.thomasmaurer.ch/2012/04/replace-diskpart-with-windows-powershell-basic-storage-cmdlets/
+
+    # Get-Disk
+    # Get-Partition
+
+    # $DiskNumber = 2
+    # Get-Partition -DiskNumber $DiskNumber
+    # Get-Disk $DiskNumber | Clear-Disk -RemoveData
+    # New-Partition -DiskNumber $DiskNumber -UseMaximumSize
+    # Get-Partition -DiskNumber $DiskNumber -PartitionNumber 1 | Format-Volume -FileSystem NTFS
+    # Set-Partition -DriveLetter E -NewDriveLetter T
+    # Set-Partition -DriveLetter T -IsActive $true
+    # Remove-Partition -DriveLetter T
+    # Set-Disk $DiskNumber -isOffline $false 
+    # Set-Disk $DiskNumber -isReadOnly $false
+    # Initialize-Disk $DiskNumber -PartitionStyle GPT
+
+    # $filePath ="c:\soisk\soisk.txt\"
+    # Invoke-Expression "explorer '/select,$filePath'"
+
+    # Get-Disk 1 | Clear-Disk -RemoveData
+    # New-Partition -DiskNumber 1 -UseMaximumSize -IsActive -DriveLetter E | Format-Volume -FileSystem NTFS -NewFileSystemLabel USB
+    # #>
+
+
+    # Get-Partition -DiskNumber $DiskNumber
+    # $Disk = Get-Disk 
+    # $Disk[$DiskNumber].GetType()
+    # $Disk[$DiskNumber].Size / 1GB
+    # Get-Partition -DiskNumber 2
+
+    # Diskpart
+    # Windos + R 
+    # Diskpart
+    # ● list volume
+    # ● select volume 3（here take volume 3 as an example）
+    # ● assign letter=E
+    # ● exit
+
+    # Get-Disk
+
+    # $diskNumber = 2
+    # Get-Disk $diskNumber | Set-Disk -IsReadOnly $false
+    # Get-Disk $diskNumber | Clear-Disk -RemoveData -Confirm:$false
+    # New-Partition -DiskNumber $diskNumber -UseMaximumSize -AssignDriveLetter | Format-Volume -FileSystem NTFS -NewFileSystemLabel "BOOTUSB" -Confirm:$false
+    # $isoPath = "$($env:UserProfile)\Downloads\Installers\Microsoft Windows 10 Edu\16299.0.171109-1522.rs3_release_svc_refresh_CLIENT_CONSUMER_X64FRE_pl-pl.iso"
+    # $c = Mount-DiskImage -ImagePath $isoPath
+    # $c
+    # $isoDrive = "G:"
+    # $usbDrive = "E:"
+    # robocopy $isoDrive $usbDrive /e
+    # bootsect /nt60 $usbDrive
+    # Dismount-DiskImage -ImagePath $isoPath
+    # Dismount-DiskImage -ImagePath $usbDrive
+}
+
 ##############################################     Development    ##############################################
 
 # Extracting used EntityFramework version and installing it globally
