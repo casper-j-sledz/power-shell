@@ -1,32 +1,3 @@
-#############################################     Function Calls    ############################################
-
-# Add-ConsoleHistoryShortcut
-# Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos" -Content "directory"
-# Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
-# Get-FunctionName
-# 
-# Optimize-Taskbar -RestartWindowsExplorer $true -RemoveTaskbarFavorites $true
-# Add-StartupShortcuts
-# Install-PowerShell
-# Install-NodeJs
-# Install-Angular -AngularVersion 16.2.11
-# Open-ProgrammingSoftwareDownloadPages
-# Add-PinPathsToMenuStart
-# Set-ClassicMenuStart
-# Set-ClassicContextMenu
-# Set-GitConfig "eg.mail@gmail.com"
-# Set-PreferredWindowsFormatting
-# Set-WindowsThemeDark
-# Show-FileExtensions
-# Uninstall-WindowsJunkApplications
-# Update-PowerShell
-# Import-VsCodeSettings # Export-VsCodeSettings
-# Disable-WindowsNotificationSounds
-# Enable-ClipboardHistory
-
-# Add-NewEnvironmentVariable -NewEnvironmentPath "C:\Tools"
-# Get-AlignedText -FilePath "$($env:UserProfile)\Downloads\RunCommands.txt" -CharSeparator '-'
-
 function Import-PowerShellProfile {
   # Open PowerShell Profile directory: `explorer.exe (Split-Path $profile)`
   $powerShellProfile = Get-ChildItem -Path (Get-Location) -Filter "power-shell_profile.ps1" -Recurse | Select-Object -First 1
@@ -43,12 +14,10 @@ function Import-PowerShellProfile {
   }
 
   $pathsToPowerShellProfiles | ForEach-Object {
-    Copy-Item  -Path $powerShellProfile.FullName -Destination $_
+    Copy-Item  -Path $powerShellProfile.FullName -Destination $_ -Force
   }
 }
 # Import-PowerShellProfile
-
-#############################################     Functions    #############################################
 
 function Add-ConsoleHistoryShortcut {
     # Open PowerShell Profile directory: `explorer.exe "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine"`
@@ -56,7 +25,7 @@ function Add-ConsoleHistoryShortcut {
 
     $shortcutPath = "$env:UserProfile\Downloads\ConsoleHistory.lnk"
     $targetPath   = "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
-    
+
     if (-not (Test-Path $targetPath)) {
         New-Item -ItemType File -Path $targetPath | Out-Null
         Write-Output "Empty file created: `"$targetPath`""
@@ -73,10 +42,12 @@ function Add-ConsoleHistoryShortcut {
 # Add-ConsoleHistoryShortcut
 
 function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
-    $Env:PATH = "$($Env:PATH);$($NewEnvironmentPath)"
+    $newPath = "$($Env:PATH);$($NewEnvironmentPath)"
+    [System.Environment]::SetEnvironmentVariable("Path", $newPath, "User")
     Write-Output $Env:PATH.Split(';')
 }
 # Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
+# Add-EnvironmentVariable -NewEnvironmentPath "$env:ProgramFiles\Notepad++"
 
 function Add-IfNotExist([string]$ItemPath, [string]$Content) {
   if (-not (Test-Path $ItemPath)) {
@@ -141,11 +112,11 @@ function Add-StartupShortcuts {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
     #%AppData%\Microsoft\Windows\Start Menu\Programs\Startup
     $shortcutPath = $env:AppData     + "\Microsoft\Windows\Start Menu\Programs\Startup"
-     
-    $msCodeInsiders  = $env:ProgramFiles        + "\Microsoft VS Code Insiders\Code - Insiders.exe"
+
+    #$msCodeInsiders  = $env:ProgramFiles        + "\Microsoft VS Code Insiders\Code - Insiders.exe"
     $msEdgePath      = ${env:ProgramFiles(x86)} + "\Microsoft\Edge\Application\msedge.exe"
     $msOutlookPath   = $env:ProgramFiles        + "\Microsoft Office\root\Office16\outlook.exe"
-    $msTeamsPath     = $env:LocalAppData        + "\Microsoft\Teams\current\Teams.exe"
+    #$msTeamsPath     = $env:LocalAppData        + "\Microsoft\Teams\current\Teams.exe"
     #$msTeamsPath     = $env:LocalAppData        + "\Microsoft\Teams\Update.exe"
     $myBookmarksPath = $env:UserProfile         + "\Downloads\0.Priv.Bookmarks&Passwords.kdbx"
     $myHoursPath     = $env:UserProfile         + "\Downloads\0.Priv.Hours.xlsb"
@@ -180,8 +151,8 @@ function Add-StartupShortcuts {
 # Add-StartupShortcuts
 
 function Disable-AutoRunApps {
-    Get-CimInstance -ClassName Win32_StartupCommand | 
-    Select-Object Name, Command, Location, User | 
+    Get-CimInstance -ClassName Win32_StartupCommand |
+    Select-Object Name, Command, Location, User |
     Sort-Object Name
 
     $PathsToQuickAccessPin | ForEach-Object {
@@ -220,7 +191,7 @@ function Disable-LockScreenApps {
     # If you were using "Windows spotlight," this will stop the fun facts and tips associated with it.
     # Disable lock screen status:
     # Under "Choose one app to show detailed status on the lock screen," select None from the dropdown menu.
-    # Remove any apps under "Choose which apps show quick status on the lock screen" by selecting them and choosing None. 
+    # Remove any apps under "Choose which apps show quick status on the lock screen" by selecting them and choosing None.
     # Remove the detailed status app from the lock screen
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Lock Screen" -Name "DetailedStatus1" -Value ""
 }
@@ -260,7 +231,7 @@ function Get-AlignedText ([string]$FilePath, [char]$CharSeparator) {
 
 function Get-IsFileDownloading([string]$path, [int]$sleepMilliseconds = 200) {
     if (-not (Test-Path $RegPath)) {
-        return $false 
+        return $false
     }
 
     # Check file size twice with a short delay
@@ -295,23 +266,23 @@ function Install-Angular ([string]$AngularVersion = '') {
     # npm notice New major version of npm available!
     npm install -g npm@latest
 
-    if ($AngularVersion -ne '') { 
+    if ($AngularVersion -ne '') {
         npm install -g "@angular/cli@$($AngularVersion)"
     } else {
         npm install -g @angular/cli
     }
-    
+
     Write-Output "`Angular has been installed.`n"
 }
 # Install-Angular
 
 function Install-NodeJs {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
-    
+
     winget install Schniz.fnm -- accept-source-agreements
     # New-Item -Path $HOME\Documents\PowerShell -ItemType directory -Force
     # New-Item $HOME\Documents\PowerShell -Name Profile.ps1 -Value "fnm env --use-on-cd | Out-String | Invoke-Expression" -ItemType "file"
-    
+
     # fnm : error: We can't find the necessary environment variables to replace the Node version.
     # https://github.com/Schniz/fnm/issues/92
     Update-Cmdlet
@@ -338,7 +309,7 @@ function Install-PowerShell {
 # Install-PowerShell
 
 function Open-ProgrammingSoftwareDownloadPages {
-    $time = [System.DateTime]::Now.AddMinutes()
+    #$time = [System.DateTime]::Now.AddMinutes()
     $ProgramsToInstall = @(
         # ,@{Program="Azure Storage Explorer";        DownloadPage="https://azure.microsoft.com/en-us/products/storage/storage-explorer#Download-4"; DownloadDirect="https://go.microsoft.com/fwlink/?linkid=2216182"; }
         # ,@{Program="Docker Desktop";                DownloadPage=""; DownloadDirect=""; }
@@ -361,19 +332,19 @@ function Open-ProgrammingSoftwareDownloadPages {
         # ,@{Program="Steam";                         DownloadPage="https://store.steampowered.com/about/"; DownloadDirect="https://cdn.fastly.steamstatic.com/client/installer/SteamSetup.exe"; }
         # ,@{Program="Ubisoft Connect";               DownloadPage="https://www.ubisoft.com/pl-pl/ubisoft-connect/download"; DownloadDirect="https://ubi.li/4vxt9"; }
     )
-    
+
     foreach ($ProgramToInstall in $ProgramsToInstall) {
-        if ($ProgramToInstall.DownloadDirect -ne '') { 
+        if ($ProgramToInstall.DownloadDirect -ne '') {
             Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadDirect
 
             # # TODO
             # $files = Get-ChildItem -Path "$($env:UserProfile)\Downloads\" -File | Where-Object { $_.CreationTime -gt $time }
             # #TODO check is page exists and file has been downloaded, if not open DownloadPage
             # foreach ($file in $files) {
-            #     while (Get-IsFileDownloading "$($env:UserProfile)\Downloads\$($file.Name)") { 
+            #     while (Get-IsFileDownloading "$($env:UserProfile)\Downloads\$($file.Name)") {
             #         Write-Output "$("$($env:UserProfile)\Downloads\$($file.Name)") still downloading...`n"
             #     }
-                
+
             #     Start-Process "$($env:UserProfile)\Downloads\$($file.Name)"
             # }
         # if not Start-Process "msedge.exe" -ArgumentList $ProgramToInstall.DownloadPage
@@ -400,12 +371,12 @@ function Optimize-Taskbar ([bool]$RestartWindowsExplorer = $false, [bool]$Remove
     #Disable taskbar programs grouping on windows snapping
     Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "EnableTaskGroups" -Type DWord -Value 0
 
-    
+
     # Set classic windows explorer context menu
     New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Force
     New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Force
     Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(Default)" -Value ""
-    
+
     if ($RemoveTaskbarFavorites) {
         # Get the registry path for taskbar pinned items
         $RegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Taskband"
@@ -427,29 +398,29 @@ function Optimize-Taskbar ([bool]$RestartWindowsExplorer = $false, [bool]$Remove
 function Set-ClassicContextMenu {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
 
-    # -> Wind + R  -> regedit 
+    # -> Wind + R  -> regedit
     #   -> HKEY_CURRENT_USER\SOFTWARE\CLASSES\CLSID
     #   -> New -> Registry Key -> {86ca1aa0-34aa-4e8b-a509-50c905bae2a2}
     #   -> New -> Registry Key -> InprocServer32 (left default value blank)
-    
+
     Write-Output "Setting up HKEY_CURRENT_USER registry."
     $path = "HKCU:\SOFTWARE\CLASSES\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}"
     New-Item -Path "$($path)\InprocServer32" -Force
 
     Write-Output "`nChanges saved. Please restart computer.`n"
 }
-# Set-ClassicContextMenu 
+# Set-ClassicContextMenu
 
 function Set-GitConfig ([string]$UserEmail) {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
-    
+
     git config --global user.email $UserEmail
     git config --global user.name "Casper J. Sledz"
     # change to use '#' char to link DevOps items
     git config --global --add core.commentchar '`'
     git config --global core.ignorecase false
 
-    git config --system core.longpaths true   
+    git config --system core.longpaths true
 
     Write-Output "`Git config has been set.`n"
 }
@@ -493,9 +464,9 @@ function Set-PreferredWindowsFormatting {
     Get-WinSystemLocale | Format-List
 
     $culture = Get-Culture
-    
+
     Write-Output "Setting up culture preferred date time formatting."
-    
+
     Set-Properties $culture.DateTimeFormat @{
       AMDesignator                     = "AM"
       AbbreviatedDayNames              = "{Sun, Mon, Tue, Wed...}"
@@ -609,20 +580,20 @@ function Set-WindowsThemeDark {
 # Set-WindowsThemeDark
 
 function Show-FileExtensions {
-  # File Explorer -> Menu (...) -> Options 
+  # File Explorer -> Menu (...) -> Options
   #  -> Open File Explorer:
   #  -> Privacy
   #    -> Show recently used files   -> UNCHECK
   #    -> Show frequently used files -> UNCHECK
   #    -> Show recommended section   -> UNCHECK
-  #  -> View 
+  #  -> View
   #    -> Advanced settings:
   #      -> Hidden files and folders -> Show hidden files, folders and drivers -> CHECK
   #      -> Hide extensions for known file types -> UNCHECK
-  
+
   #reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced /v HideFileExt /t REG_DWORD /d 0 /f
   Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0
-  
+
   # Restart Windows Explorer to apply changes
   Stop-Process -Name explorer -Force
   Start-Process explorer
@@ -630,7 +601,7 @@ function Show-FileExtensions {
 # Show-FileExtensions
 
 function Start-PowerShellAsAdmin {
-    Start-Process powershell –verb runAs
+    Start-Process powershell -verb runAs
 }
 
 function Uninstall-WindowsJunkApplications {
@@ -682,7 +653,7 @@ function Uninstall-WindowsJunkApplications {
     foreach ($appName in $appNames) {
         Get-AppxPackage $appName | Remove-AppxPackage
     }
-    
+
     Get-AppxPackage | Sort-Object Name | Format-Table Name, PackageFullName
     Write-Output "`Windows junk applications uninstalled.`n"
 }
@@ -705,7 +676,7 @@ function Export-VsCodeSettings {
   $FileExtensions    = "extensions.txt"
   $FileKeyBindings   = "keybindings.json"
   $FileSettings      = "settings.json"
-  
+
   Copy-Item "$PathCodeSettings\$FileKeyBindings" "$PathSettingsStore\$FileKeyBindings" -Force
   Copy-Item "$PathCodeSettings\$FileSettings"    "$PathSettingsStore\$FileSettings"    -Force
   Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
@@ -719,7 +690,7 @@ function Import-VsCodeSettings {
   $FileExtensions    = "extensions.txt"
   $FileKeyBindings   = "keybindings.json"
   $FileSettings      = "settings.json"
-  
+
   Copy-Item "$PathSettingsStore\$FileKeyBindings" $PathCodeSettings -Force
   Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
   Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
