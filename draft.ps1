@@ -265,13 +265,6 @@ $path = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\My
 if(Test-Path $path)
     {Remove-Item -Path $path}
 
-### Untrack all packages.lock.json files
-
-$root = Get-Location
-Get-ChildItem -Path "." -Filter "packages.lock.json" -Recurse | ForEach-Object {
-    git update-index --assume-unchanged ".\$($_.FullName.Substring($root.Path.Length + 1))"
-}
-
 ############################ Pictures ############################
 # Set the folder to scan
 $folderPath = "$($env:UserProfile)\Pictures\"

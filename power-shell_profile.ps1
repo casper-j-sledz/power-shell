@@ -719,6 +719,14 @@ function Enable-ClipboardHistory {
 }
 # Enable-ClipboardHistory
 
+function Set-GitUntrack([string]$FileName, [string] $RootPath, [bool]$Revert = $false) {
+  $command = if ($Revert) { "--assume-unchanged" } else { "--no-assume-unchanged" }
+  Get-ChildItem -Path $RootPath -Filter $FileName -Recurse | ForEach-Object {
+      git update-index $command "$RootPath\$($_.FullName.Substring($RootPath.Path.Length + 1))"
+  }
+}
+# Set-GitUntrack -FileName "packages.lock.json" -RootPath Get-Location # -Revert $true
+
 #################################################     TODO    ##################################################
 
 function Install-PreferredLanguageAndConfigure {
