@@ -1,6 +1,7 @@
 
 function Import-PowerShellProfile {
-  # Open PowerShell Profile directory: `explorer.exe (Split-Path $profile)`
+  # Open PowerShell Profile directory: `explorer "$(Split-Path $profile)"`
+  #                                    `explorer "$env:UserProfile\Documents\WindowsPowerShell"`
   $powerShellProfile = Get-ChildItem -Path (Get-Location) -Filter "power-shell_profile.ps1" -Recurse | Select-Object -First 1
   $pathsToPowerShellProfileDirectory = "$env:UserProfile\Documents\WindowsPowerShell"
   $pathsToPowerShellProfiles = @(
@@ -20,6 +21,10 @@ function Import-PowerShellProfile {
 }
 ###################################    SYSTEM INIT    ###################################
 
+# Executing command with admin rights elevation.
+$command = "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force"
+Start-Process powershell -Verb RunAs -ArgumentList @("-NoExit", "-Command", "`"$command`"") # Command isn't passed to admin PS
+
 #### IMPORT POWERSHELL FUNCTIONS 
 Import-PowerShellProfile # May require powershell restart
 
@@ -29,7 +34,6 @@ Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\R
 Disable-WindowsNotificationSounds
 Disable-QuickAccessRecentAndFrequentFiles
 Enable-ClipboardHistory
-Import-EdgeBookmarks
 Optimize-Taskbar -RestartWindowsExplorer $true -RemoveTaskbarFavorites $true
 Set-PolishProgrammersKeyboard
 Set-PreferredWindowsFormatting
@@ -51,13 +55,19 @@ Show-FileExtensions
 # Install-NodeJs
 # Install-Angular -AngularVersion 16.2.11
 
+## User:   `explorer "$env:LocalAppData\Programs\Microsoft VS Code\Code.exe"`
+## Global: `explorer "$env:ProgramFiles\Microsoft VS Code\Code.exe"`
+# Add-VsCodeToExplorerContextMenu -ItemName "Open with Code" -AppPath "$env:LocalAppData\Programs\Microsoft VS Code\Code.exe"
+
 # Add-EnvironmentVariable -NewEnvironmentPath "$env:ProgramFiles\Notepad++"
 # Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
 
 #### FUNCTIONAL
+# Set-GitUntrack  -FileName "packages.lock.json" -RootPath (Get-Location) #-Revert
 # Get-AlignedText -FilePath "$($env:UserProfile)\Downloads\RunCommands.txt" -CharSeparator '-'
 
 #### WITH DIFFICULTIES
+# Import-EdgeBookmarks       # (TO FIX)
 # Set-ClassicContextMenu     # (TO FIX)
 # Install-PowerShell         # (Separate PS instance, not Windows PowerShell)
 # Add-ConsoleHistoryShortcut # (DEPRECATED) 

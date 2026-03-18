@@ -45,6 +45,26 @@ function Add-IfNotExist([string]$ItemPath, [string]$Content) {
 }
 # Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos" -Content "directory"
 
+function Add-NotepadPlugins {
+  Write-Host "Closing Notepad++ before installation..." 
+  Stop-Process -Name "Notepad++" -Force -ErrorAction SilentlyContinue 
+  Start-Sleep -Seconds 1
+  
+  # Changes in "$env:ProgramFiles` requires Admin rights elevation
+  $pluginsDirectory = "$env:ProgramFiles\Notepad++\plugins"
+  
+  $plugin = "ComparePlus" 
+  $url = "https://github.com/pnedev/comparePlus/releases/download/cp_2.2.0/ComparePlus_cp_2.2.0_x64.zip"
+  Expand-WebArchive -Url $url -ExpandPath "$pluginsDirectory/$plugin" -DownloadedFileName "$plugin" -RemoveDownloadedFile $true
+
+  $plugin = "DSpellCheck" 
+  $url = "https://github.com/Predelnik/DSpellCheck/releases/download/v1.5.0/DSpellCheck_x64.zip"
+  Expand-WebArchive -Url $url -ExpandPath "$pluginsDirectory/$plugin" -DownloadedFileName "$plugin" -RemoveDownloadedFile $true
+
+  Write-Host "Plugins installed. Running Notepad++..."
+  & "$pluginsDirectory/../notepad++.exe"
+}
+
 function Add-PinPathsToMenuStart {
   #Create Recycle Bin Shortcut
   $recycleBinShortcutPath = "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk"
@@ -119,6 +139,26 @@ function Add-StartupShortcuts ([string]$Company = "cjs") {
     Write-Output "Function executed. `n"
 }
 # Add-StartupShortcuts
+
+function Add-VsCodeToExplorerContextMenu ([string]$ItemName, [string]$AppPath) {
+  # FOLDER (right click on folder) 
+  Add-ToExplorerContextMenuBase -ItemName $ItemName -AppPath $AppPath -RegistryPath "HKCU:\Software\Classes\Directory\shell"
+  # FOLDER BACKGROUND (right click on folder background)
+  Add-ToExplorerContextMenuBase -ItemName $ItemName -AppPath $AppPath -RegistryPath "HKCU:\Software\Classes\Directory\Background\shell"
+  # FILE (right click on file)
+  Add-ToExplorerContextMenuBase -ItemName $ItemName -AppPath $AppPath -RegistryPath "HKCU:\Software\Classes\AllFilesystemObjects\shell"
+}
+# Add-VsCodeToExplorerContextMenu -ItemName "Open with Code" -AppPath "$env:LocalAppData\Programs\Microsoft VS Code\Code.exe"
+
+function Add-ToExplorerContextMenuBase ([string]$ItemName, [string]$AppPath, [string]$RegistryPath) {
+  $placeholder = if ($RegistryPath -like "*Directory*") { "%V" } else { "%1" }
+  $RegistryPath = "$RegistryPath\$ItemName" 
+  New-Item -Path $RegistryPath -Force | Out-Null 
+  Set-ItemProperty -Path $RegistryPath -Name "(Default)" -Value $ItemName
+  Set-ItemProperty -Path $RegistryPath -Name "Icon"      -Value "`"$AppPath`"" 
+  New-Item -Path "$RegistryPath\command" -Force | Out-Null 
+  Set-ItemProperty -Path "$RegistryPath\command" -Name "(Default)" -Value "`"$AppPath`" `"$placeholder`""
+}
 
 function Disable-AutoRunApps {
     Get-CimInstance -ClassName Win32_StartupCommand |
@@ -198,16 +238,28 @@ function Enable-ClipboardHistory {
 }
 # Enable-ClipboardHistory
 
+function Expand-WebArchive([string]$Url, [string]$ExpandPath, [string]$DownloadedFileName, [bool]$RemoveDownloadedFile = $true) {
+  $zip = "$env:UserProfile\downloads\$DownloadedFileName.zip"
+  Write-Host "Downloading $zip..." 
+  Invoke-WebRequest -Uri $Url -OutFile $zip
+  Expand-Archive -Path $zip -DestinationPath $ExpandPath -Force
+  if ($RemoveDownloadedFile) { Remove-Item $zip }
+}
+# Expand-WebArchive -Url $url -ExpandPath "$pluginsDirectory\$plugin" -DownloadedFileName "$plugin" -RemoveDownloadedFile $true
+
 function Export-VsCodeSettings {
-  $PathSettingsStore = ".\vscode-settings"
+  $location          = Get-Location
   $PathCodeSettings  = "$env:AppData\Code\User"
   $FileExtensions    = "extensions.txt"
   $FileKeyBindings   = "keybindings.json"
   $FileSettings      = "settings.json"
 
-  Copy-Item "$PathCodeSettings\$FileKeyBindings" "$PathSettingsStore\$FileKeyBindings" -Force
-  Copy-Item "$PathCodeSettings\$FileSettings"    "$PathSettingsStore\$FileSettings"    -Force
-  Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
+  Copy-Item -Path "$PathCodeSettings\$FileKeyBindings" `
+    -Destination (Get-ChildItem -Path $location -Filter $FileKeyBindings -Recurse | Select-Object -First 1).FullName -Force
+  Copy-Item -Path "$PathCodeSettings\$FileSettings" `
+    -Destination (Get-ChildItem -Path $location -Filter $FileSettings -Recurse | Select-Object -First 1).FullName -Force
+  code.cmd --list-extensions --show-versions | Out-File `
+    -FilePath (Get-ChildItem -Path $location -Filter $FileExtensions -Recurse | Select-Object -First 1).FullName -Encoding utf8
   Write-Output "`Settings have been exported.`n"
 }
 # Export-VsCodeSettings
@@ -251,7 +303,7 @@ function Import-EdgeBookmarks {
     $edgeBookmarks = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Bookmarks"
 
     # Source bookmarks file
-    $sourceBookmarksFile = "$Env:UserProfile\Downloads\Bookmarks"
+    $sourceBookmarksFile = ".\power-shell\resources\bookmarks.html"
 
     # Copy as JSON
     Copy-Item $sourceBookmarksFile $edgeBookmarks -Force
@@ -281,7 +333,7 @@ function Import-PowerShellProfile {
 # Import-PowerShellProfile
 
 function Import-VsCodeSettings {
-  $PathSettingsStore = ".\vscode-settings"
+  $PathSettingsStore = ".\power-shell\resources\vscode-settings"
   $PathCodeSettings  = "$env:AppData\Code\User"
   $FileExtensions    = "extensions.txt"
   $FileKeyBindings   = "keybindings.json"
@@ -460,13 +512,15 @@ function Set-GitConfig ([string]$UserEmail) {
 }
 # Set-GitConfig "eg.mail@gmail.com"
 
-function Set-GitUntrack([string]$FileName, [string] $RootPath, [bool]$Revert = $false) {
-  $command = if ($Revert) { "--assume-unchanged" } else { "--no-assume-unchanged" }
+function Set-GitUntrack([string]$FileName, [string] $RootPath, [switch]$Revert) {
+  $command = if ($Revert) { "--no-assume-unchanged" } else { "--assume-unchanged" }
+  $message = if ($Revert) { "Reverting untrack for" } else { "Untracking" }
+  Write-Output "$message $FileName files in $RootPath"
   Get-ChildItem -Path $RootPath -Filter $FileName -Recurse | ForEach-Object {
-      git update-index $command "$RootPath\$($_.FullName.Substring($RootPath.Path.Length + 1))"
+    & git update-index $command "$RootPath\$($_.FullName.Substring($RootPath.Length + 1))"
   }
 }
-# Set-GitUntrack -FileName "packages.lock.json" -RootPath Get-Location # -Revert $true
+# Set-GitUntrack -FileName "packages.lock.json" -RootPath (Get-Location) #-Revert
 
 function Set-PolishProgrammersKeyboard {
     # Get current language list
