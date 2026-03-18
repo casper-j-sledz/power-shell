@@ -1,26 +1,5 @@
-function Import-PowerShellProfile {
-  # Open PowerShell Profile directory: `explorer.exe (Split-Path $profile)`
-  $powerShellProfile = Get-ChildItem -Path (Get-Location) -Filter "power-shell_profile.ps1" -Recurse | Select-Object -First 1
-  $pathsToPowerShellProfileDirectory = "$env:UserProfile\Documents\WindowsPowerShell"
-  $pathsToPowerShellProfiles = @(
-    "$pathsToPowerShellProfileDirectory\Microsoft.PowerShellISE_profile.ps1"
-    "$pathsToPowerShellProfileDirectory\Microsoft.PowerShell_profile.ps1"
-    "$pathsToPowerShellProfileDirectory\Microsoft.VSCode_profile.ps1"
-  )
-
-  # Create directory if not exists
-  if (-not (Test-Path $pathsToPowerShellProfileDirectory)) {
-      New-Item -ItemType Directory -Path $pathsToPowerShellProfileDirectory -Force
-  }
-
-  $pathsToPowerShellProfiles | ForEach-Object {
-    Copy-Item  -Path $powerShellProfile.FullName -Destination $_ -Force
-  }
-}
-# Import-PowerShellProfile
-
 function Add-ConsoleHistoryShortcut {
-    # Open PowerShell Profile directory: `explorer.exe "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine"`
+    # Open PowerShell History directory: `explorer "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine"`
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
 
     $shortcutPath = "$env:UserProfile\Downloads\ConsoleHistory.lnk"
@@ -46,7 +25,6 @@ function Add-EnvironmentVariable ([string]$NewEnvironmentPath) {
     [System.Environment]::SetEnvironmentVariable("Path", $newPath, "User")
     Write-Output $Env:PATH.Split(';')
 }
-# Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
 # Add-EnvironmentVariable -NewEnvironmentPath "$env:ProgramFiles\Notepad++"
 
 function Add-IfNotExist([string]$ItemPath, [string]$Content) {
@@ -108,31 +86,23 @@ function Add-Shortcut([string]$ShortcutPath, [string]$TargetPath) {
 }
 # Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
 
-function Add-StartupShortcuts {
+function Add-StartupShortcuts ([string]$Company = "cjs") {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
-    #%AppData%\Microsoft\Windows\Start Menu\Programs\Startup
-    $shortcutPath = $env:AppData     + "\Microsoft\Windows\Start Menu\Programs\Startup"
-
-    #$msCodeInsiders  = $env:ProgramFiles        + "\Microsoft VS Code Insiders\Code - Insiders.exe"
-    $msEdgePath      = ${env:ProgramFiles(x86)} + "\Microsoft\Edge\Application\msedge.exe"
-    $msOutlookPath   = $env:ProgramFiles        + "\Microsoft Office\root\Office16\outlook.exe"
-    #$msTeamsPath     = $env:LocalAppData        + "\Microsoft\Teams\current\Teams.exe"
-    #$msTeamsPath     = $env:LocalAppData        + "\Microsoft\Teams\Update.exe"
-    $myBookmarksPath = $env:UserProfile         + "\Downloads\0.Priv.Bookmarks&Passwords.kdbx"
-    $myHoursPath     = $env:UserProfile         + "\Downloads\0.Priv.Hours.xlsb"
-    #$myNotesPath     = $env:UserProfile         + "\Downloads\0.AccDoc.Main.md"
-    $notepadPath     = $env:ProgramFiles        + "\Notepad++\notepad++.exe"
+    # Open User Startup directory: `explorer "$env:AppData\Microsoft\Windows\Start Menu\Programs\Startup"`
+    $startupPath = "$env:AppData\Microsoft\Windows\Start Menu\Programs\Startup"
+    $titCompany  = $Company.Substring(0,1).ToUpper() + $Company.Substring(1)
 
     $shortcuts = @(
-        #@{shortcutPath=$shortcutPath + "\VS Code Insiders.lnk";          targetPath=$msCodeInsiders; },
-        @{shortcutPath=$shortcutPath + "\Edge.lnk";                       targetPath=$msEdgePath;     },
-        @{shortcutPath=$shortcutPath + "\Outlook.lnk";                    targetPath=$msOutlookPath;  },
-        #@{shortcutPath=$shortcutPath + "\Microsoft Teams.lnk";           targetPath=$msTeamsPath;    },
-        #@{shortcutPath=$shortcutPath + "\Microsoft Teams.lnk";           targetPath=$msTeamsPath;    arguments="--processStart `"Teams.exe`"" },
-        @{shortcutPath=$shortcutPath + "\0.Priv.Bookmarks&Passwords.lnk"; targetPath=$myBookmarksPath;},
-        @{shortcutPath=$shortcutPath + "\0.Priv.Hours.lnk";               targetPath=$myHoursPath;     },
-        @{shortcutPath=$shortcutPath + "\0.AccDoc.Main.lnk";              targetPath=$myNotesPath;    },
-        @{shortcutPath=$shortcutPath + "\Notepad++.lnk";                  targetPath=$notepadPath;    }
+        @{shortcutPath="$startupPath\Edge.lnk";             targetPath="${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe" },
+        @{shortcutPath="$startupPath\Outlook.lnk";          targetPath="$env:ProgramFiles\Microsoft Office\root\Office16\outlook.exe" },
+        #@{shortcutPath="$startupPath\VS Code Insiders.lnk"; targetPath="$env:ProgramFiles\Microsoft VS Code Insiders\Code - Insiders.exe" },
+        #@{shortcutPath="$startupPath\VS Insiders.lnk";      targetPath="$env:ProgramFiles\Microsoft VS Code\Code.exe" },
+        @{shortcutPath="$startupPath\Notepad++.lnk";        targetPath="$env:ProgramFiles\Notepad++\notepad++.exe" },
+        #@{shortcutPath="$startupPath\Microsoft Teams.lnk";  targetPath="$env:LocalAppData\Microsoft\Teams\current\Teams.exe" },
+        #@{shortcutPath="$startupPath\Microsoft Teams.lnk";  targetPath="$env:LocalAppData\Microsoft\Teams\Update.exe"; arguments="--processStart `"Teams.exe`"" },
+        @{shortcutPath="$startupPath\CJS_Work.lnk";         targetPath="$env:UserProfile\source\repos\work-repository\CJS_Work.kdbx" },
+        @{shortcutPath="$startupPath\Private.Hours.lnk";    targetPath="$env:UserProfile\source\repos\work-repository\.private.hours.xlsb" },
+        @{shortcutPath="$startupPath\$titCompany.Main.lnk"; targetPath="$env:UserProfile\source\repos\work-repository\.$Company.main.md" }
     )
 
     foreach ($shortcut in $shortcuts) {
@@ -213,6 +183,35 @@ function Disable-QuickAccessRecentAndFrequentFiles {
 }
 # Disable-QuickAccessRecentAndFrequentFiles
 
+function Disable-WindowsNotificationSounds {
+  #Disable Windows notification sounds (without blocking toasts)
+  Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "(Default)" -Value ""
+}
+# Disable-WindowsNotificationSounds
+
+function Enable-ClipboardHistory {
+  Set-ItemProperty `
+    -Path "HKCU:\Software\Microsoft\Clipboard" `
+    -Name "EnableClipboardHistory" `
+    -Type DWord `
+    -Value 1
+}
+# Enable-ClipboardHistory
+
+function Export-VsCodeSettings {
+  $PathSettingsStore = ".\vscode-settings"
+  $PathCodeSettings  = "$env:AppData\Code\User"
+  $FileExtensions    = "extensions.txt"
+  $FileKeyBindings   = "keybindings.json"
+  $FileSettings      = "settings.json"
+
+  Copy-Item "$PathCodeSettings\$FileKeyBindings" "$PathSettingsStore\$FileKeyBindings" -Force
+  Copy-Item "$PathCodeSettings\$FileSettings"    "$PathSettingsStore\$FileSettings"    -Force
+  Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
+  Write-Output "`Settings have been exported.`n"
+}
+# Export-VsCodeSettings
+
 function Get-AlignedText ([string]$FilePath, [char]$CharSeparator) {
     $maxLength = 0
     $lines     = (Get-Content -Path $FilePath).Split([Environment]::NewLine)
@@ -259,6 +258,41 @@ function Import-EdgeBookmarks {
     Write-Host "Bookmarks imported from $sourceBookmarksFile to $exportPath successfully!" -ForegroundColor Green
 }
 # Import-EdgeBookmarks
+
+function Import-PowerShellProfile {
+  # Open PowerShell Profile directory: `explorer (Split-Path $profile)`
+  $powerShellProfile = Get-ChildItem -Path (Get-Location) -Filter "power-shell_profile.ps1" -Recurse | Select-Object -First 1
+  $pathsToPowerShellProfileDirectory = "$env:UserProfile\Documents\WindowsPowerShell"
+  $pathsToPowerShellProfiles = @(
+    "$pathsToPowerShellProfileDirectory\Microsoft.PowerShellISE_profile.ps1"
+    "$pathsToPowerShellProfileDirectory\Microsoft.PowerShell_profile.ps1"
+    "$pathsToPowerShellProfileDirectory\Microsoft.VSCode_profile.ps1"
+  )
+
+  # Create directory if not exists
+  if (-not (Test-Path $pathsToPowerShellProfileDirectory)) {
+      New-Item -ItemType Directory -Path $pathsToPowerShellProfileDirectory -Force
+  }
+
+  $pathsToPowerShellProfiles | ForEach-Object {
+    Copy-Item  -Path $powerShellProfile.FullName -Destination $_ -Force
+  }
+}
+# Import-PowerShellProfile
+
+function Import-VsCodeSettings {
+  $PathSettingsStore = ".\vscode-settings"
+  $PathCodeSettings  = "$env:AppData\Code\User"
+  $FileExtensions    = "extensions.txt"
+  $FileKeyBindings   = "keybindings.json"
+  $FileSettings      = "settings.json"
+
+  Copy-Item "$PathSettingsStore\$FileKeyBindings" $PathCodeSettings -Force
+  Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
+  Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
+  Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
+}
+# Import-VsCodeSettings
 
 function Install-Angular ([string]$AngularVersion = '') {
     Write-Output "`nInitializing function `"$(Get-FunctionName)`"`n"
@@ -425,6 +459,14 @@ function Set-GitConfig ([string]$UserEmail) {
     Write-Output "`Git config has been set.`n"
 }
 # Set-GitConfig "eg.mail@gmail.com"
+
+function Set-GitUntrack([string]$FileName, [string] $RootPath, [bool]$Revert = $false) {
+  $command = if ($Revert) { "--assume-unchanged" } else { "--no-assume-unchanged" }
+  Get-ChildItem -Path $RootPath -Filter $FileName -Recurse | ForEach-Object {
+      git update-index $command "$RootPath\$($_.FullName.Substring($RootPath.Path.Length + 1))"
+  }
+}
+# Set-GitUntrack -FileName "packages.lock.json" -RootPath Get-Location # -Revert $true
 
 function Set-PolishProgrammersKeyboard {
     # Get current language list
@@ -658,65 +700,3 @@ function Uninstall-WindowsJunkApplications {
     Write-Output "`Windows junk applications uninstalled.`n"
 }
 # Uninstall-WindowsJunkApplications
-
-function Update-Cmdlet {
-    Write-Output "`nUpdating cmdlet functions (Environment Variables)`"$(Get-FunctionName)`"`n"
-
-    $Env:PATH.Split(';')
-    $Env:PATH = [System.Environment]::GetEnvironmentVariable("Path", "User")
-
-    Write-Output "`Cmdlet functions updated:`n"
-    $Env:PATH.Split(';')
-}
-# Update-Cmdlet
-
-function Export-VsCodeSettings {
-  $PathSettingsStore = ".\vscode-settings"
-  $PathCodeSettings  = "$env:AppData\Code\User"
-  $FileExtensions    = "extensions.txt"
-  $FileKeyBindings   = "keybindings.json"
-  $FileSettings      = "settings.json"
-
-  Copy-Item "$PathCodeSettings\$FileKeyBindings" "$PathSettingsStore\$FileKeyBindings" -Force
-  Copy-Item "$PathCodeSettings\$FileSettings"    "$PathSettingsStore\$FileSettings"    -Force
-  Code --list-extensions --show-versions | Out-File "$PathSettingsStore\$FileExtensions" -Encoding utf8
-  Write-Output "`Settings have been exported.`n"
-}
-# Export-VsCodeSettings
-
-function Import-VsCodeSettings {
-  $PathSettingsStore = ".\vscode-settings"
-  $PathCodeSettings  = "$env:AppData\Code\User"
-  $FileExtensions    = "extensions.txt"
-  $FileKeyBindings   = "keybindings.json"
-  $FileSettings      = "settings.json"
-
-  Copy-Item "$PathSettingsStore\$FileKeyBindings" $PathCodeSettings -Force
-  Copy-Item "$PathSettingsStore\$FileSettings"    $PathCodeSettings -Force
-  Get-Content "$PathSettingsStore\$FileExtensions" | ForEach-Object { "code --install-extension $_" }
-  Write-Output "`Settings have been imported. Paste the commands listed into the console to install the extensions.`n"
-}
-# Import-VsCodeSettings
-
-function Disable-WindowsNotificationSounds {
-  #Disable Windows notification sounds (without blocking toasts)
-  Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\Notification.Default\.Current" -Name "(Default)" -Value ""
-}
-# Disable-WindowsNotificationSounds
-
-function Enable-ClipboardHistory {
-  Set-ItemProperty `
-    -Path "HKCU:\Software\Microsoft\Clipboard" `
-    -Name "EnableClipboardHistory" `
-    -Type DWord `
-    -Value 1
-}
-# Enable-ClipboardHistory
-
-function Set-GitUntrack([string]$FileName, [string] $RootPath, [bool]$Revert = $false) {
-  $command = if ($Revert) { "--assume-unchanged" } else { "--no-assume-unchanged" }
-  Get-ChildItem -Path $RootPath -Filter $FileName -Recurse | ForEach-Object {
-      git update-index $command "$RootPath\$($_.FullName.Substring($RootPath.Path.Length + 1))"
-  }
-}
-# Set-GitUntrack -FileName "packages.lock.json" -RootPath Get-Location # -Revert $true

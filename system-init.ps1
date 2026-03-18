@@ -18,30 +18,47 @@ function Import-PowerShellProfile {
     Copy-Item  -Path $powerShellProfile.FullName -Destination $_ -Force
   }
 }
-###################################    System Init    ###################################
+###################################    SYSTEM INIT    ###################################
 
+#### IMPORT POWERSHELL FUNCTIONS 
 Import-PowerShellProfile # May require powershell restart
-#(DEPRECATED) Add-ConsoleHistoryShortcut
- Add-IfNotExist -ItemPath "$($env:UserProfile)\source\repos1" -Content "directory"
-# Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
-# Optimize-Taskbar -RestartWindowsExplorer $true -RemoveTaskbarFavorites $true
-# Add-StartupShortcuts
-# Install-PowerShell
+
+#### WINDOWS CONFIG  
+Add-IfNotExist -ItemPath "$env:UserProfile\source\repos" -Content "directory"
+Add-Shortcut -ShortcutPath "$env:AppData\Microsoft\Windows\Start Menu\Programs\Recycle Bin.lnk" -TargetPath "shell:RecycleBinFolder"
+Disable-WindowsNotificationSounds
+Disable-QuickAccessRecentAndFrequentFiles
+Enable-ClipboardHistory
+Import-EdgeBookmarks
+Optimize-Taskbar -RestartWindowsExplorer $true -RemoveTaskbarFavorites $true
+Set-PolishProgrammersKeyboard
+Set-PreferredWindowsFormatting
+Set-TimeUtc1-00
+Set-WindowsThemeDark
+Show-FileExtensions
+
+#### MANUAL CONFIG
+# Add-StartupShortcuts -Company "cjs"
+# Add-PinPathsToMenuStart
+# Uninstall-WindowsJunkApplications
+
+#### SOFTWARE
+# Set-GitConfig "eg.mail@gmail.com"
+
+# Import-VsCodeSettings # Export-VsCodeSettings
+# Open-ProgrammingSoftwareDownloadPages
+
 # Install-NodeJs
 # Install-Angular -AngularVersion 16.2.11
-# Open-ProgrammingSoftwareDownloadPages
-# Add-PinPathsToMenuStart
-# Set-ClassicMenuStart
-# Set-ClassicContextMenu
-# Set-GitConfig "eg.mail@gmail.com"
-# Set-PreferredWindowsFormatting
-# Set-WindowsThemeDark
-# Show-FileExtensions
-# Uninstall-WindowsJunkApplications
-# Update-PowerShell
-# Import-VsCodeSettings # Export-VsCodeSettings
-# Disable-WindowsNotificationSounds
-# Enable-ClipboardHistory
 
-# Add-NewEnvironmentVariable -NewEnvironmentPath "C:\Tools"
+# Add-EnvironmentVariable -NewEnvironmentPath "$env:ProgramFiles\Notepad++"
+# Add-EnvironmentVariable -NewEnvironmentPath "$env:UserProfile\source\latexmk"
+
+#### FUNCTIONAL
 # Get-AlignedText -FilePath "$($env:UserProfile)\Downloads\RunCommands.txt" -CharSeparator '-'
+
+#### WITH DIFFICULTIES
+# Set-ClassicContextMenu     # (TO FIX)
+# Install-PowerShell         # (Separate PS instance, not Windows PowerShell)
+# Add-ConsoleHistoryShortcut # (DEPRECATED) 
+# Set-ClassicMenuStart       # (NOT WORKING)

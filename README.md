@@ -1,6 +1,7 @@
 > # PowerShell
 > ## Files
 >> * **[Power Shell Profile](power-shell_profile.ps1)**
+>> * **[System Init](system-init.ps1)**
 >> * **[Draft](draft.ps1)**
 >> * **[CMD History](cmd-history.ps1)**
 > ## Console History
