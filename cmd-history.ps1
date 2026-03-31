@@ -1,25 +1,37 @@
 # %AppDta%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
-################################### OLD CMD History ###################################
-Get-NetIPAddress -AddressFamily IPv4
-forfiles /S /M * /C "cmd /c if @fsize GEQ 104857600 echo @path > LargeFilesList.txt"
-git filter-repo --invert-paths --path Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.dll
-git gc --prune=now --aggressive
-git lfs install
-git lfs track "Dependencies\ODAC122010Client_x64\instantclient_12_2\oraociei12.dll"
-git log --pretty=fuller
-git merge --edit --no-fastForward
-git rebase -i --root
-git reflog expire --expire=now --all
-git reflog expire --expire=now --all; git gc --prune=now --aggressive
-git rm -r Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.sym
-git signature
-java -jar bfg.jar --delete-files Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.dll
-java -jar bfg.jar --delete-files oraociei12.dll
-java -jar bfg.jar --strip-blobs-bigger-than 100M
-java -jar bfg.jar --strip-blobs-bigger-than 100M CwisGui.WebService.git
-java -jar bfg.jar --strip-blobs-bigger-than 100M some-big-repo.git
-nslookup
-################################### NEW  CMD History ###################################
+#\n& "c:[\/]Program Files[\/]Git[\/]cmd[\/]git[.]exe.*
+################################### NEW CMD History ###################################
+code "$env:UserProfile\source\repos\work-repository"
+docker-compose up
+dotnet build
+dotnet restore
+explorer "$env:LocalAppData\Programs\Microsoft VS Code"
+explorer "$env:UserProfile\source\repos\work-repository\private.hours.xlsb"
+explorer "$env:UserProfile\source\repos\work-repository\CJS_Work.kdbx"
+Get-CimInstance Win32 OperatingSystem I select-object LastBootUpTime
+git clone https://github.com/casper-i-sledz/work-repository.git
+git checkout -b "feature/[JIRA-$number] - $name" "origin/develop" --no-track
+git push --force-with-lease
+git push --set-upstream origin (git branch --show-current)
+git stash -m "DROP ME: Local Dev env config"
+git stash save "TEMP_$(Get-Date -Format "yyyy-MM-dd_HH:mm")"; git pull; git stash apply
+git submodule foreach git pull
+git submodule update --init --recursive
+git update-index --assume-unchanged vsCode.sln
+notepad++ "$env:UserProfile\source\repos\.master-repository\work-repository\power-shell\cmd-history.ps1"
+podman machine init --now
+podman machine rm -f
+podman machine start
+podman machine stop
+podman start minio-buckets
+podman start minio-buckets-1
+Remove-Item "C:\Program Files\Notepad++\plugins\DSpellCheck" -Force -Recurse
+Set-GitUntrack -FileName "packages.lock.json" -RootPath (Get-Location) #-Revert
+Set-Location..
+wsl --install
+WSL >> sudo apt update
+WSL >> sudo apt upgrade
+################################### MIDDLE CMD History ###################################
 Get-ChildItem -Filter *.dll | Add-Member NoteProperty AssemblyVersion([Reflection.AssemblyName]::GetAssemblyName($_.FullName).Version)
 Get-ChildItem -Filter *.dll | Add-Member NoteProperty FileVersion ($_.VersionInfo.FileVersion)
 $tree = TREE $path
@@ -45,9 +57,9 @@ az serviceBus namespace authorization-rule keys list --resource-group local-grou
 az serviceBus namespace exists --name $name
 az version
 azurite --silent --location c:\azurite --debug c:\azurite\debug.log
-DotNet ef database update
-DotNet restore $sln
-DotNet ef migrations add $migrationName
+dotnet ef database update
+dotnet restore $sln
+dotnet ef migrations add $migrationName
 dotnet --info
 dotnet build
 dotnet build $csprojPath --force
@@ -168,6 +180,26 @@ Start-Process chrome --auto-open-devtools-for-tabsgit init
 vsts-npm
 vsts-npm-auth
 vsts-npm-auth -config .npmrc
-vsts-npm-auth -config .npmrc 
+vsts-npm-auth -config .npmrc
 vsts-npm-auth -f -config .npmrc
 npm install --legacy-peer-deps
+################################### OLD CMD History ###################################
+Get-NetIPAddress -AddressFamily IPv4
+forFiles /S /M * /C "cmd /c if @fsize GEQ 104857600 echo @path > LargeFilesList.txt"
+git filter-repo --invert-paths --path Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.dll
+git gc --prune=now --aggressive
+git lfs install
+git lfs track "Dependencies\ODAC122010Client_x64\instantclient_12_2\oraociei12.dll"
+git log --pretty=fuller
+git merge --edit --no-fastForward
+git rebase -i --root
+git reflog expire --expire=now --all
+git reflog expire --expire=now --all; git gc --prune=now --aggressive
+git rm -r Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.sym
+git signature
+java -jar bfg.jar --delete-files Dependencies/ODAC122010Client_x64/instantclient_12_2/oraociei12.dll
+java -jar bfg.jar --delete-files oraociei12.dll
+java -jar bfg.jar --strip-blobs-bigger-than 100M
+java -jar bfg.jar --strip-blobs-bigger-than 100M CwisGui.WebService.git
+java -jar bfg.jar --strip-blobs-bigger-than 100M some-big-repo.git
+nslookup
