@@ -1,58 +1,62 @@
-# %AppDta%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
-#\n& "c:[\/]Program Files[\/]Git[\/]cmd[\/]git[.]exe.*
+#region OTHERS
+  # %AppDta%\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+  #\n& "c:[\/]Program Files[\/]Git[\/]cmd[\/]git[.]exe.*
+#endregion #################################### #################################### ####################################
 
 #region POWER SHELL
-  # POWER SHELL user & machine info 
-  "User: $S(whoami), Machine: $(hostname)"
-  # POWER SHELL path operations 
-  Test-Path $path 
-  Split-Path $path 
-  Split-Path $path -Leaf 
-  Split-Path -Path $path -Parent 
-  # POWER SHELL get current editor file (.ps1) path 
-  $psEditor.GetEditorContext().CurrentFile.Path 
+  # POWER SHELL user & machine info
+  "User: $(whoami), Machine: $(hostname)"
+  # POWER SHELL path operations
+  Test-Path $path
+  Split-Path $path
+  Split-Path $path -Leaf
+  Split-Path -Path $path -Parent
+  # POWER SHELL get current editor file (.ps1) path
+  $psEditor.GetEditorContext().CurrentFile.Path
+  # POWER SHELL open current .ps1 file in Notepad++
+  notepad++ ($psEditor.GetEditorContext().CurrentFile.Path)
   # POWER SHELL go folder up
-  Set-Location .. 
+  Set-Location ..
   # POWER SHELL create VS Code link and add to folder in start menu
   Set-VsCodeLink -FolderPath "$env:UserProfile\source\repos\work-repository" -LinkPath "$vsCodeMenuStartPath\Work-Repository"
-  # POWER SHELL force remove item 
-  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.NETCore.App\9.0.14" -Force -Recurse 
-  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.14" -Force -Recurse 
-  # POWER SHELL get last machine boot time 
-  Get-CimInstance Win32_OperatingSystem I select-object LastBootUpTime 
-  # POWER SHELL open file VS Code 
-  Code "$eny:UserProfile\source\repos\work-repository" 
-  Code "$env:AppData\Microsoft\lindows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt" 
-  Code "$eny:AppData\Microsoft\lindows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
-  Code "$env:ExampleProject\src\.github\copilot-instructions.md" 
-  # POWER SHELL open in vs code Rider user global settings 
-  Code "$env:AppData\JetBrains\Rider2025.3\resharper-host\GlobalSettingsStorage.DotSettings" 
+  # POWER SHELL force remove item
+  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.NETCore.App\9.0.14" -Force -Recurse
+  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.14" -Force -Recurse
+  # POWER SHELL get last machine boot time
+  Get-CimInstance Win32_OperatingSystem | select-object LastBootUpTime
+  # POWER SHELL open file VS Code
+  Code "$env:UserProfile\source\repos\work-repository"
+  Code "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine\Visual Studio Code Host_history.txt"
+  Code "$env:AppData\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
+  Code "$env:ExampleProject\src\.github\copilot-instructions.md"
+  # POWER SHELL open in vs code Rider user global settings
+  Code "$env:AppData\JetBrains\Rider2025.3\resharper-host\GlobalSettingsStorage.DotSettings"
   # POWER SHELL open file with default application
-  explorer "$env:LocalAppData\Programs\Microsoft VS Code" 
-  explorer "$env:UserProfile\source\repos\work-repository\private.hours.xlsb" 
-  explorer "$env:UserProfile\source\repos\work-repository\CJ5_Work.kdbx" 
+  explorer "$env:LocalAppData\Programs\Microsoft VS Code"
+  explorer "$env:UserProfile\source\repos\work-repository\private.hours.xlsb"
+  explorer "$env:UserProfile\source\repos\work-repository\CJ5_Work.kdbx"
   # POWER SHELL open file with notepad++
-  notepad++ "$env:UserProfile\source\repos\.master-repository\work-repository\power-shell\cmd-history.ps1" 
-  # POWER SHELL release port if occupied by other process 
-  $port = 7000 
-  $proc = (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue).OwningProcess 
+  notepad++ "$env:UserProfile\source\repos\.master-repository\work-repository\power-shell\cmd-history.ps1"
+  # POWER SHELL release port if occupied by other process
+  $port = 7000
+  $proc = (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue).OwningProcess
   if ($proc) { Stop-Process -Id $proc -Force -ErrorAction SilentlyContinue }
-  # POWER SHELL add repository to environment variables (requires powershell restart) 
-  [System.Environment]::SetEnvironmentVariable("ExampleProject", "$env:UserProfile\source\repos\ExampleProject", "User") 
-  # POWER SHELL add scheduled task to compose containers on login 
-  # use command 'podman start (podman ps --all --quiet)" 
-  #& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command `"podman start (podman ps --all --quiet)`"; "Exit-$LastExitCode`"" 
+  # POWER SHELL add repository to environment variables (requires powershell restart)
+  [System.Environment]::SetEnvironmentVariable("ExampleProject", "$env:UserProfile\source\repos\ExampleProject", "User")
+  # POWER SHELL add scheduled task to compose containers on login
+  # use command 'podman start (podman ps --all --quiet)'
+  #& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command `"podman start (podman ps --all --quiet)`"; "Exit-$LastExitCode`""
   $action = New-ScheduledTaskAction -Execute "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument `
-    "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"podman machine start; podman start (podman ps --all --quiet)`" `"Exit-$LastExitCode`""
-  $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME 
+    "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"podman machine start; podman start (podman ps --all --quiet)`"; `"Exit-$LastExitCode`""
+  $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
   $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Minutes 15) -RestartCount 5 -RestartInterval (New-TimeSpan -Minutes 2)
   Register-ScheduledTask -TaskName "ExampleProject-Podman-Start" -Action $action -Trigger $trigger -Settings $settings `
-    -Description "Start ExampleProject containers on login" - Force #RunLevel Highest
-  # POWER SHELL get list of scheduled tasks 
-  Get-ScheduledTask | Select-Object TaskName, State, TaskPath | Where-Object { $_.TaskName -like "*ExampleProject*" } | Sort-Object TaskName | Format-Table -AutoSize 
+    -Description "Start ExampleProject containers on login" - Force #-RunLevel Highest
+  # POWER SHELL get list of scheduled tasks
+  Get-ScheduledTask | Select-Object TaskName, State, TaskPath | Where-Object { $_.TaskName -like "*ExampleProject*" } | Sort-Object TaskName | Format-Table -AutoSize
   # POWER SHELL get logs for scheduled task
   Get-WinEvent -FilterHashtable @{ LogName = "Microsoft-Windows-TaskScheduler/Operational"; StartTime = (Get-Date).Date.AddHours(12) } | Where-Object `
-    { $_.Message -like "*ExampleProject.Podman-Start*" } | Select-Object TimeCreated, Id, LevelDisplayName, Message | Format-List 
+    { $_.Message -like "*ExampleProject.Podman-Start*" } | Select-Object TimeCreated, Id, LevelDisplayName, Message | Format-List
   # POWER SHELL trigger scheduled task manually
   Start-ScheduledTask -TaskName "ExampleProject-Podman-Start"
   # POWER SHELL remove scheduled task by name
@@ -62,7 +66,7 @@
 #region POWER SHELL ADMIN
   # Windows incorrect time issue
     # POWER SHELL ADMIN 1. Reset time service
-    net stop w32tine
+    net stop  w32time
     net start w32time
     # POWER SHELL ADMIN 2. Enforce time service resync
     w32tm /resync /force
@@ -72,22 +76,14 @@
     w32tm /query /peers
 
   # POWER SHELL ADMIN copilot-instructions symbolic link
-  Set-Location "$env:ExampleProject": New-Item -ItemType SymbolicLink -Path .github\copilot-instructions.md -Target src\.github\copilot-instructions.md
-#endregion #################################### #################################### ####################################
-
-#region WSL
-  # WSL install
-  wsl --install
-  # WSL (requires sudo password)
-  & "$env:SystemRoot\system32\ws1.exe" -e sudo apt update
-  & "$env:SystemRoot\system3&\ws1.exe" -e sudo apt upgrade
+  Set-Location "$env:ExampleProject"; New-Item -ItemType SymbolicLink -Path .github\copilot-instructions.md -Target src\.github\copilot-instructions.md
 #endregion #################################### #################################### ####################################
 
 #region BASH
   # BASH show current directory
-  & "$env:Programfiles\Git\bin\bash.exe" -c "pwd"
+  & "$env:ProgramFiles\Git\bin\bash.exe" -c "pwd"
   # BASH run scripts
-  & "$env:Programfiles\Git\bin\bash.exe" -c "cd ~/source/repos/solution/project && sh BashScript.sh"
+  & "$env:ProgramFiles\Git\bin\bash.exe" -c "cd ~/source/repos/solution/project && sh BashScript.sh"
 #endregion #################################### #################################### ####################################
 
 #region GIT
@@ -95,20 +91,23 @@
   git config --global core.editor "code --wait --reuse-window"
   git config --list | Select-String "editor"
   # GIT submodules management
-  Get-Content"$env:UserProfile\source\repos\work-repository\-gitmodules" |Format-List
+  Get-Content "$env:UserProfile\source\repos\work-repository\.gitmodules" | Format-List
   git submodule foreach git pull origin main
   git config set advice.submoduleMergeConflict false
   git submodule update --init --recursive
   git submodule set-branch --branch main notes
   git submodule foreach git reset --hard "origin/main"
-  #GIT
-  git clone https://github.com/casper-j-sledz/work-repository-git
-  git push --set-upstream origin (git --show-current)
-  git push --force-with-lease
+  # GIT
+  git clone https://github.com/casper-j-sledz/work-repository.git
+  git push --set-upstream origin (git branch --show-current)
   git stash -m "DROP ME: Local Dev env config"
-  git stash save "TEMP_S(Get-Date -Format "yyyy-NM-dd_HH:mm")"; git pull; git stash apply
-  git update-index "assume-unchanged exampleFile.md"
+  git stash save "TEMP_$(Get-Date -Format "yyyy-MM-dd_HH:mm")"; git pull; git stash apply
+  git update-index --assume-unchanged "exampleFile.md"
   Set-GitUntrack -FileName "packages.lock.json" -RootPath (Get-Location) #-Revert
+  # GIT fix up last commit with previous one
+  $env:GIT_SEQUENCE_EDITOR = "`"$env:ProgramFiles\Git\usr\bin\sed.exe`" -i `"2s/^pick/fixup/`""; git rebase -i HEAD~2; ` Remove-Item Env:GIT_SEQUENCE_EDITOR
+  # GIT push force no override co-editors changes
+  git push --force-with-lease
   # GIT disconnect origin branch
   git branch --unset-upstream
   # GIT don't track file changes
@@ -120,7 +119,70 @@
   # GIT print staged (cached) changes of current branch
   Set-Location "$env:ExampleProject"; git --no-pager diff --cached
   # GITLAB open my merge requests in browser
-  Set-Location "$env:ExampleProject"; Start-Process "$((git remote get-url origin).Replace('git', ''))/-/merge_requests/?author_username=cjSledz"
+  Set-Location "$env:ExampleProject"; Start-Process "$((git remote get-url origin).Replace('git', ''))/-/merge_requests/?author_username=exampleUser"
+#endregion #################################### #################################### ####################################
+
+#region DOTNET
+  # DOTNET build and run API project
+  dotnet build "$env:ExampleProject/src/ExampleProject.Api" --configuration Release --noLogo -v q
+  $projectPath = "$env:ExampleProject/src/ExampleProject.Api"
+  Start-Process -Fi1ePath "dotnet" -ArgumentList "run --project `"$projectPath`" --configuration Release --no-build" -NoNewWindow
+  # DOTNET
+  Set-Location "$env:ExampleProject\src"; dotnet restore
+  dotnet restore "$env:ExampleProject\src\ExampleProject.Tests\ExampleProject.Tests.csproj" --use-lock-file --force-evaluate
+  dotnet --list-sdks
+  dotnet tool list -g | Select-String -Pattern "ef"
+  dotnet tool list -g | Format-Table; dotnet --version
+  # DOTNET run project
+  #   locks console with api output
+  dotnet run "$projectPath" --configuration Release --noLogo -v q --no-build
+  #   run in separate process
+  Start-Process -FilePath "dotnet" -ArgumentList "run --project `"$projectPath`" --configuration Release --no-build" -NoNewWindow
+  # DOTNET runtimes issue: ProjectXYZ has to be added to perform dropping views during CI/CD migration, because current solution works only on runtime
+  dotnet --list-runtimes
+  WinGet install Microsoft.DotNet.SDK.10
+  WinGet uninstall --name ".NET Runtime 9.0.14"
+  WinGet uninstall --name ".NET Windows Desktop Runtime 9.0.14"
+  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.NETCore.App\9.0.14" -Force -Recurse
+  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.14" -Force -Recurse
+#endregion #################################### #################################### ####################################
+
+#region DOTNET EF CORE
+  # DOTNET EF CORE: Add Migration
+  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef migrations add "MigrationName" --startup-project ../ExampleProject.Api;
+  # DOTNET EF CORE: update ef to particular version
+  dotnet tool update dotnet-ef --version 10.0.5
+  dotnet tool restore
+  dotnet ef --version
+  # DOTNET EF CORE: Reset database
+  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef database drop --force;
+  # DOTNET EF CORE: Get list of migrations
+  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef migrations list --no-build --startup-project ../ExampleProject.Api;
+  # DOTNET EF CORE: Update database to selected from end migration
+  Set-Location "$env:ExampleProject/Infrastructure";
+  $migrations = dotnet ef migrations list --no-build --startup-project ../ExampleProject.Api
+  $migration = $migrations[$migrations.Length - 1]
+  dotnet ef database update $migration --startup-project ../ExampleProject.Api
+  # DOTNET EF CORE: Update database to latest migration
+  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef database update --startup-project ../ExampleProject.Api
+#endregion #################################### #################################### ####################################
+
+#region FFMPEG
+  # FFMPEG install audio processor
+  WinGet install --id Gyan.FFmpeg --accept-package-agreements --accept-source-agreements
+  # FFMPEG convert given .mp4 file to WAV format
+  Set-Location "$env:UserProfile\Videos\Screen Recordings"; ffmpeg -i "$($FileName).mp4" -vn -ac 1 -ar 16000 -c:a pcm_s16le "$($FileName).wav"-y
+  # FFMPEG cut / trim and convert given .mp4 file to WAV format
+  Set-Location "$env:UserProfile\Videos\Screen Recordings";
+  ffmpeg -ss 00:00:06 -i "$($FileName).mp4" -to 00:24:00 -vn -ac 1 -ar 16000 -c:a pcm_s16le "$($FileName).wav" -y
+#endregion #################################### #################################### ####################################
+
+#region WSL
+  # WSL install
+  wsl --install
+  # WSL (requires sudo password)
+  & "$env:SystemRoot\system32\wsl.exe" -e sudo apt update
+  & "$env:SystemRoot\system32\wsl.exe" -e sudo apt upgrade
 #endregion #################################### #################################### ####################################
 
 #region PODMAN
@@ -133,61 +195,7 @@
   # PODMAN start all containers
   podman start (podman ps --all --quiet)
   # PODMAN stop all containers
-  podman stop (podman ps --al1 --quiet)
-#endregion #################################### #################################### ####################################
-
-#region DOTNET
-  # DOTNET build and run API project
-  dotnet build "$env:ExampleProject/src/ExampleProject.Api" --configuration Release --noLogo -v q 
-  $projectPath = "$env:ExampleProject/src/ExampleProject.Api"
-  Start-Process -Fi1ePath "dotnet" -ArgumentList "run --project `"$projectPath`" --configuration Release --no-build" -NoNewWindow
-  # DOTNET
-  dotnet restore "$env:ExampleProject\src\ExampleProject.Tests\ExampleProject.Tests.csproj" --use-lock-file --force-evaluate
-  dotnet --list-sdks
-  dotnet tool list -g | Select-String -Pattern "ef"
-  dotnet tool list -g | Format-Table; dotnet --version 
-  # DOTNET run project 
-  #   locks console with api output 
-  dotnet run "$projectPath" --configuration Release --noLogo -v q --no-build 
-  #   run in separate process
-  Start-Process -FilePath "dotnet" -ArgumentList "run --project `"$projectPath`" --configuration Release --no-build" -NoNewWindow
-  # DOTNET runtimes issue: ProjectXYZ has to be added to perform dropping views during CI/CD migration, because current solution works only on runtime
-  dotnet --list-runtimes 
-  winget install Microsoft.DotNet.SDK.10 
-  winget uninstall --name ".NET Runtime 9.0.14"
-  winget uninstall --name ".NET Windows Desktop Runtime 9.0.14"
-  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.NETCore-App\9.0.14" -Force -Recurse
-  Remove-Item "C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.14" -Force -Recurse
-  Set-Location "$env:ExampleProject\src"; dotnet restore
-#endregion #################################### #################################### ####################################
-
-#region DOTNET EF CORE
-  # DOTNET EF CORE migrations 
-  # DOTNET EF CORE: Add Migration
-  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef migrations add "MigrationName" --startup-project ../ExampleProject.Api; 
-  # DOTNET EF CORE: update ef to particular version
-  dotnet tool update dotnet-ef --version 10.0.5 dotnet tool restore dotnet ef --version 
-  # DOTNET EF CORE: Reset database 
-  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef database drop --force; 
-  # DOTNET EF CORE: Get list of migrations 
-  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef migrations list --no-build --startup-project ../ExampleProject.Api; 
-  # DOTNET EF CORE: Update database to selected from end migration
-  Set-Location "$env:ExampleProject/Infrastructure";
-  $migrations = dotnet ef migrations list --no-build --startup-project ../ExampleProject.Api
-  $migration = $migrations[$migrations.Length - 1] 
-  dotnet ef database update $migration --startup-project ../ExampleProject.Api
-  # DOTNET EF CORE: Update database to latest migration 
-  Set-Location "$env:ExampleProject/Infrastructure"; dotnet ef database update --startup-project ../ExampleProject.Api
-#endregion #################################### #################################### ####################################
-
-#region FFMPEG
-  # FFMPEG install audio processor
-  winget install --id Gyan.FFmpeg --accept-package-agreements --accept-source-agreements
-  # FFMPEG convert given .mp4 file to WAV format 
-  Set-Location "$env:UserProfile\Videos\Screen Recordings"; ffmpeg -i "$($FileName).mp4" -vn -ac 1 -ar 16000 -c:a pcm_s16le "$($FileName).way"-y 
-  # FFMPEG cut / trim and convert given .mp4 file to WAV format
-  Set-Location "$env:UserProfile\Videos\Screen Recordings"; 
-  ffmpeg -ss 00:00:06 -i "$($FileName).mp4" -to 00:24:00 -vn -ac 1 -ar 16000 -c:a pcm_s16le "$($FileName).way" -y
+  podman stop (podman ps --all --quiet)
 #endregion #################################### #################################### ####################################
 
 #region NPM
